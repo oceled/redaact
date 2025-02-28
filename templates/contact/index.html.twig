@@ -1,0 +1,134 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Contact - RED'ACT{% endblock %}
+
+{% block body %}
+<header class="header-global">
+    <nav id="navig" aria-label="Primary navigation" class="navbar navbar-expand-lg headroom fixed-top navbar-light navbar-theme-primary">
+        <div class="container-fluid">
+            <div class="row align-items-center w-100">
+                <!-- Logo Section -->
+                <div class="col-2">
+                    <a class="navbar-brand d-flex align-items-center" href="{{ path('app_home') }}">
+                        <span class="h6 mb-0 ms-2" id="brandname">REDA'ACT</span>
+                    </a>
+                </div>
+                
+                <!-- Description Section -->
+                <div class="col-6 text-center">
+                    <span class="fs-6 fw-bold">Éditeur de procédures pour systéme qualité Qualiopi</span>
+                </div>
+                
+                <!-- User Info & Settings Section -->
+                <div class="col-4">
+                    <div class="d-flex align-items-center justify-content-end gap-3">
+                       <!-- User Dropdown -->
+                        {% if app.user %}
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-circle-user fa-2x"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#infoModal">
+                                        Vos informations
+                                    </a>
+                                </li>
+                                <li><a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                            </ul>
+                        </div>
+                        {% else %}
+                        <div class="d-flex">
+                            <a href="{{ path('app_login') }}" class="btn btn-primary text-secondary me-2">Se connecter</a>
+                            <a href="{{ path('app_registration_step1') }}" class="btn btn-primary text-secondary">S'inscrire</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<main class="mr-4 ml-4 mt-5 pt-5">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col">
+                <div class="card bg-primary shadow-soft border-light">
+                    <div class="card-header text-center">
+                        <h2 class="card-title">Contactez-nous</h2>
+                        <p class="text-muted">Une question? Un problème? N'hésitez pas à nous écrire.</p>
+                    </div>
+                    <div class="card-body">
+                        {% for message in app.flashes('success') %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+
+                        {{ form_start(form) }}
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(form.name) }}
+                                        {{ form_widget(form.name) }}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors(form.name) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        {{ form_label(form.email) }}
+                                        {{ form_widget(form.email) }}
+                                        <div class="invalid-feedback">
+                                            {{ form_errors(form.email) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                {{ form_label(form.subject) }}
+                                {{ form_widget(form.subject) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.subject) }}
+                                </div>
+                            </div>
+                            
+                            <div class="form-group mb-3">
+                                {{ form_label(form.message) }}
+                                {{ form_widget(form.message) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.message) }}
+                                </div>
+                            </div>
+                            
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-secondary">Envoyer le message</button>
+                            </div>
+							
+							{% for message in app.flashes('error') %}
+								<div class="alert alert-danger alert-dismissible fade show" role="alert">
+									{{ message }}
+									<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+								</div>
+							{% endfor %}
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+					<div class="export-buttons no-print">
+						<a href="{{ path('app_dashboard') }}" class="btn btn-primary shadow-soft border-light">
+							<i class="fas fa-arrow-left"></i>
+							Retour au tableau de bord
+						</a>
+					</div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% include 'footer.html.twig' %}
+{% endblock %}

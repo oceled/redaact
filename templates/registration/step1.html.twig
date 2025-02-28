@@ -1,0 +1,76 @@
+{# templates/registration/step1.html.twig #}
+{% extends 'registration/layout.html.twig' %}
+
+{% block title %}Inscription - Étape 1{% endblock %}
+
+{% block registration_title %}Créer un compte{% endblock %}
+
+{% block registration_content %}
+		{% for message in app.flashes('error') %}
+			<div class="alert alert-danger">
+				{{ message }}
+			</div>
+		{% endfor %}
+    {{ form_start(registrationForm, {'attr': {'class': 'needs-validation'}}) }}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                {{ form_row(registrationForm.firstName, {
+                    'attr': {
+                        'class': 'form-control',
+                        'placeholder': 'Votre prénom'
+                    }
+                }) }}
+            </div>
+            <div class="col-md-6 mb-3">
+                {{ form_row(registrationForm.lastName, {
+                    'attr': {
+                        'class': 'form-control',
+                        'placeholder': 'Votre nom'
+                    }
+                }) }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(registrationForm.email, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': 'Votre email'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(registrationForm.password, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': 'Choisissez un mot de passe'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(registrationForm.userInfo.orgaSiret, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': '14 chiffres'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(registrationForm.userInfo.orgaName, {
+                'attr': {
+                    'class': 'form-control',
+                    'placeholder': 'Nom de votre organisation'
+                }
+            }) }}
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+                Continuer
+            </button>
+        </div>
+    {{ form_end(registrationForm) }}
+{% endblock %}

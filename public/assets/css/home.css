@@ -1,0 +1,41 @@
+#brandname {
+	 font-family: "Playwrite AU VIC Guides", serif; 
+}
+#navig 
+{
+    box-shadow: 6px 6px 12px #b8b9be,-6px -6px 12px #fff;
+}
+.lifonc {
+	list-style : none;
+}
+.licon {
+margin-right: 20px;
+}
+
+/*** Pricing Start ***/
+.price .price-item {
+    position: relative;
+    overflow: hidden;
+    transition: 0.5s;
+}
+
+.price .price-item:hover {
+    background: var(--bs-white) !important;
+    box-shadow: 0 0 45px rgba(0, 0, 0, 0.2);
+}
+
+.price .price-item .pice-item-offer {
+    position: absolute;
+    width: 200px;
+    height: 110px;
+    top: -45px;
+    right: -80px;
+    background: var(--bs-primary) !important;
+    color: var(--bs-white);
+    transform: rotate(42deg);
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding-bottom: 10px;
+}
+/*** Pricing End ***/

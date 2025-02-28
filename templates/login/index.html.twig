@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+<div class="container mx-auto px-4 py-8">
+    <div class="col-12 col-md-6 col-lg-5 mx-auto">
+        <div class="card bg-primary shadow-soft border-light p-4">
+            <div class="card-header text-center pb-0">
+                <h2 class="h4">Connexion à la plateforme</h2>
+                <span>Connectez-vous avec votre email et mot de passe</span>
+            </div>
+
+            <div class="card-body">
+                {% if error %}
+                    <div class="alert alert-danger text-danger" role="alert">
+                        <span class="block sm:inline">{{ error.messageKey|trans(error.messageData, 'security') }}</span>
+                    </div>
+                {% endif %}
+
+                <form method="post" class="mt-4">
+                    <!-- Email Input -->
+                    <div class="form-group">
+                        <label for="email">Votre email</label>
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><span class="fas fa-envelope"></span></span>
+                            </div>
+                            <input class="form-control" 
+                                   id="email"
+                                   type="email"
+                                   name="_username"
+                                   value="{{ last_username }}"
+                                   placeholder="exemple@domaine.com"
+                                   required
+                                   autofocus>
+                        </div>
+                    </div>
+
+                    <!-- Password Input -->
+                    <div class="form-group">
+                        <label for="password">Mot de passe</label>
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text"><span class="fas fa-unlock-alt"></span></span>
+                            </div>
+                            <input class="form-control"
+                                   id="password"
+                                   type="password"
+                                   name="_password"
+                                   placeholder="Mot de passe"
+                                   required>
+                        </div>
+                    </div>
+
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                    <!-- Remember me & Lost password -->
+                    <div class="d-block d-sm-flex justify-content-between align-items-center mb-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remember_me" name="_remember_me">
+                            <label class="form-check-label" for="remember_me">
+                                Se souvenir de moi
+                            </label>
+                        </div>
+                        <div><a href="#" class="small text-right">Mot de passe oublié ?</a></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-block btn-primary">Se connecter</button>
+                </form>
+
+                <div class="mt-3 mb-4 text-center">
+                    <span class="font-weight-normal">ou connectez-vous avec</span>
+                </div>
+
+                <div class="btn-wrapper my-4 text-center">
+                    <button class="btn btn-primary btn-pill btn-icon-only text-facebook mr-2" type="button" aria-label="facebook">
+                        <span aria-hidden="true" class="fab fa-facebook-f"></span>
+                    </button>
+                    <button class="btn btn-primary btn-pill btn-icon-only text-twitter mr-2" type="button" aria-label="twitter">
+                        <span aria-hidden="true" class="fab fa-twitter"></span>
+                    </button>
+                    <button class="btn btn-primary btn-pill btn-icon-only text-facebook" type="button" aria-label="github">
+                        <span aria-hidden="true" class="fab fa-github"></span>
+                    </button>
+                </div>
+
+                <div class="d-block d-sm-flex justify-content-center align-items-center mt-4">
+                    <span class="font-weight-normal">
+                        Pas encore inscrit ?
+                        <a href="{{ path('app_registration_step1') }}" class="font-weight-bold">Créer un compte</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}

@@ -1,0 +1,27 @@
+<?php
+namespace App\Repository;
+
+use App\Entity\IndUpdt;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Persistence\ManagerRegistry;
+
+class IndUpdtRepository extends ServiceEntityRepository
+{
+    public function __construct(ManagerRegistry $registry)
+    {
+        parent::__construct($registry, IndUpdt::class);
+    }
+
+    public function getNextUpdateNumber(IndCrea $revision): int
+    {
+        $latestUpdate = $this->createQueryBuilder('u')
+            ->where('u.revision = :revision')
+            ->setParameter('revision', $revision)
+            ->orderBy('u.n_updt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        return $latestUpdate ? $latestUpdate->getNUpdt() + 1 : 2;
+    }
+}

@@ -1,0 +1,535 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Procédure {{ indicator.indName }}
+{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .iso-document {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+			background-color: #fff;
+        }
+        .preview-container {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            border: 1px solid #000;
+        }
+        .header-table td {
+            border: 1px solid #000;
+            padding: 10px;
+        }
+        .logo-cell {
+            width: 20%;
+            text-align: center;
+            vertical-align: middle;
+            position: relative;
+        }
+        .title-cell {
+            width: 60%;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .ref-cell {
+            width: 20%;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .procedure-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .procedure-subtitle {
+            font-size: 16px;
+            margin: 5px 0 0 0;
+        }
+        .reference {
+            font-weight: bold;
+            margin: 0;
+        }
+        .page-number {
+            margin: 5px 0 0 0;
+        }
+        .org-logo {
+            max-width: 100%;
+            max-height: 100px;
+            height: auto;
+        }
+        .logo-upload-container {
+            margin-top: 10px;
+        }
+        .logo-upload-label {
+            cursor: pointer;
+            padding: 5px 10px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9em;
+        }
+        .logo-upload-label:hover {
+            background-color: #e9ecef;
+        }
+        .logo-upload-form {
+            margin: 0;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            justify-content: center;
+        }
+        .export-button {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .export-button:hover {
+            background: #f5f5f5;
+            transform: translateY(-1px);
+        }
+        .export-button i {
+            margin-right: 8px;
+        }
+        .google-drive {
+            color: #1a73e8;
+        }
+        .onedrive {
+            color: #0078d4;
+        }
+        .word {
+            color: #2b579a;
+        }
+        .iso-section {
+            margin-bottom: 30px;
+        }
+        .iso-section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        @media print {
+            .no-print, .export-buttons, .logo-upload-container {
+                display: none;
+            }
+            .preview-container {
+                box-shadow: none;
+            }
+			.page-break {
+                page-break-before: always;
+            }
+            
+            /* Cache les numéros de page par défaut */
+            .page-number {
+                display: none;
+            }
+            
+            /* Affiche uniquement le numéro de page correct */
+            .page-number.active {
+                display: block;
+            }
+        }
+		.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 5px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    text-align: right;
+    gap: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+.edit-icon {
+        cursor: pointer;
+        margin-left: 8px;
+        color: #6c757d;
+    }
+    .edit-icon:hover {
+        color: #0d6efd;
+    }
+	.modal-backdrop {
+    display: none !important;
+}
+    </style>
+{% endblock %}
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('assets/js/logoUpld.js') }}"></script>
+	<!-- Ajout de la définition de window.indicators -->
+<script>
+
+    window.indicators = [{
+        indNumb: {{ indicator.indNumb }},
+        indName: "{{ indicator.indName }}",
+        procRef: "{{ indicator.orgaProc.orgaInfo.procRef|default('ProQ-i') }}",
+        procTitle: "{{ indicator.orgaProc.orgaInfo.procTitle|default('Procédure Qualité') }}"
+    }];
+</script>
+
+<!-- Modification du script des modals -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du DOM
+    const editIcon = document.getElementById('editTitleIcon');
+    const titleInput = document.getElementById('editTitleInput');
+    const titleDisplay = document.querySelector('.procedure-title');
+    const saveButton = document.getElementById('saveTitleBtn');
+    const modalElement = document.getElementById('editTitleModal');
+    
+    // Initialisation du modal Bootstrap
+    const modal = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: true
+    });
+
+    // Gestionnaire d'ouverture du modal
+    editIcon.addEventListener('click', function() {
+        titleInput.value = titleDisplay.textContent.trim();
+        modal.show();
+    });
+
+    // Debug - Ajout de logs
+    console.log('Indicateur actuel:', window.indicators[0]); 
+
+    // Gestionnaire de sauvegarde
+    saveButton.addEventListener('click', async function() {
+        const newTitle = titleInput.value.trim();
+        const currentIndicator = window.indicators[0];
+
+        console.log('Tentative de sauvegarde:', {
+            newTitle,
+            currentIndicator
+        });
+
+        if (!newTitle) {
+            alert('Le titre ne peut pas être vide');
+            return;
+        }
+
+        try {
+            const response = await fetch('/update-procedure-refs', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    fieldType: 'procTitle',
+                    newValue: newTitle,
+                    indNumb: currentIndicator.indNumb
+                })
+            });
+
+            console.log('Réponse reçue:', response);
+
+            const data = await response.json();
+            console.log('Données reçues:', data);
+
+            if (data.success) {
+                titleDisplay.textContent = newTitle;
+                window.indicators[0].procTitle = newTitle;
+                modal.hide();
+            } else {
+                alert('Erreur lors de la sauvegarde: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Erreur détaillée:', error);
+            alert('Une erreur est survenue lors de la sauvegarde');
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments du DOM pour la référence
+    const editRefIcon = document.getElementById('editRefIcon');
+    const refInput = document.getElementById('editRefInput');
+    const refDisplay = document.querySelector('.reference');
+    const saveRefButton = document.getElementById('saveRefBtn');
+    const refModalElement = document.getElementById('editRefModal');
+    
+    // Initialisation du modal Bootstrap pour la référence
+    const refModal = new bootstrap.Modal(refModalElement, {
+        backdrop: 'static',
+        keyboard: true
+    });
+
+    // Gestionnaire d'ouverture du modal de référence
+    editRefIcon.addEventListener('click', function() {
+        const currentRef = window.indicators[0].procRef;
+        refInput.value = currentRef;
+        refModal.show();
+    });
+
+    // Gestionnaire de sauvegarde de la référence
+    saveRefButton.addEventListener('click', async function() {
+        const newRef = refInput.value.trim();
+        const currentIndicator = window.indicators[0];
+
+        console.log('Tentative de sauvegarde de la référence:', {
+            newRef,
+            currentIndicator
+        });
+
+        if (!newRef) {
+            alert('La référence ne peut pas être vide');
+            return;
+        }
+
+        try {
+            const response = await fetch('/update-procedure-refs', { 
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    fieldType: 'procRef',
+                    newValue: newRef,
+                    indNumb: currentIndicator.indNumb
+                })
+            });
+
+            console.log('Réponse reçue:', response);
+
+            const data = await response.json();
+            console.log('Données reçues:', data);
+
+            if (data.success) {
+                window.indicators[0].procRef = newRef;
+                refDisplay.textContent = `${newRef}-${String(currentIndicator.indNumb).padStart(2, '0')}`;
+                refModal.hide();
+            } else {
+                alert('Erreur lors de la sauvegarde: ' + (data.error || 'Erreur inconnue'));
+            }
+        } catch (error) {
+            console.error('Erreur détaillée:', error);
+            alert('Une erreur est survenue lors de la sauvegarde');
+        }
+    });
+});
+</script>
+	{% endblock %}
+
+
+{% block body %}
+<div class="bg-primary min-vh-100 py-5">
+    <div class="iso-document">
+        <div class=" border-light p-4">
+            <table class="table table-bordered">
+                <tbody>
+                    <tr>
+                        <td class="logo-cell">
+                            {% if indicator.orgaProc.orgaInfo.logo is defined and indicator.orgaProc.orgaInfo.logo is not empty %}
+                                <img src="{{ asset('uploads/logos/' ~ indicator.orgaProc.orgaInfo.logo) }}" 
+                                     alt="Logo organisation" 
+                                     class="org-logo" 
+                                     style="max-width: 100px; height: auto;">
+                            {% endif %}
+                            <div class="logo-upload-container no-print">
+                                <form id="logoUploadForm" class="logo-upload-form" enctype="multipart/form-data">
+                                    <label for="logoFile" class="logo-upload-label">
+                                        <i class="fas fa-upload"></i>
+                                        <span>{% if indicator.orgaProc.orgaInfo.logo %}Changer le logo{% else %}Ajouter un logo{% endif %}</span>
+                                    </label>
+                                    <input type="file" id="logoFile" name="logo" accept="image/*" class="logo-upload-input" style="display: none;">
+                                </form>
+                            </div>
+                        </td>
+                        <td class="title-cell">
+    <div class="editable-container">
+        <p class="procedure-title" data-field="procTitle">
+            {{ indicator.orgaProc.orgaInfo.procTitle|default('Procédure Qualité') }}
+        </p>
+        <i class="fas fa-edit edit-icon no-print" id="editTitleIcon"></i>
+    </div>
+    <hr style="border-top: 1px solid black; margin: 0px;">
+    <p class="procedure-subtitle">{{ indicator.indName }}</p>
+</td>
+<td class="ref-cell">
+    <div class="editable-container">
+        <p class="reference" data-field="procRef">
+            {{ indicator.orgaProc.orgaInfo.procRef|default('ProQ-i') }}-{{ "%02d"|format(indicator.indNumb) }}
+        </p>
+        <i class="fas fa-edit edit-icon no-print" id="editRefIcon"></i>
+    </div>
+    <p class="page-number">Page : <span class="current-page">1</span> / <span class="total-pages">1</span></p>
+</td>
+                    </tr>
+                </tbody>
+            </table>
+
+                     <div class="document-content">
+                <div class="iso-section">
+                    <div class="iso-section-title">1 . OBJET</div>
+                    <div class="iso-content">{{ indicator.indObject|raw }}</div>
+                </div>
+                <div class="iso-section">
+                    <div class="iso-section-title">2 . MISE EN APPLICATION</div>
+                    <div class="iso-content">{{ indicator.indDetail|raw }}</div>
+                </div>
+
+                <div class="iso-section">
+                    <div class="iso-section-title">3 . DOCUMENTS ASSOCIÉS</div>
+                    <div class="iso-content">{{ indicator.indFiles|raw }}</div>
+                </div>
+            </div>
+
+            <!-- Original content remains the same until the document-footer -->
+
+					<div class="document-footer">
+    <table class="table table-bordered mt-4">
+        <thead>
+            <tr>
+                <th colspan="6" class="text-center">Révisions</th>
+            </tr>
+            <tr>
+                <th>Date</th>
+                <th>Motif</th>
+                <th>Version</th>
+                <th>Rédacteur</th>
+                <th>Approbateur</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if indicator.revisions|length > 0 %}
+                {# Affichage de la création initiale depuis IndCrea #}
+                {% set initialRevision = indicator.revisions|first %}
+                <tr>
+                    <td>{{ initialRevision.dCreate|date("d/m/Y") }}</td>
+                    <td>Création initiale</td>
+                    <td>1</td>
+                    <td>{{ initialRevision.indRedac }}</td>
+                    <td>{{ initialRevision.indApprob }}</td>
+                </tr>
+                
+                {# Affichage des mises à jour depuis IndUpdt avec les bonnes valeurs #}
+                {% for revision in initialRevision.updates|sort((a, b) => a.nVers <=> b.nVers) %}
+                    <tr>
+                        <td>{{ revision.dUpdt|date("d/m/Y") }}</td>
+                        <td>{{ revision.motif }}</td>
+                        <td>{{ revision.nVers }}</td>
+                        <td>{{ revision.indRedac }}</td>
+                        <td>{{ revision.indApprob }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td>{{ "now"|date("d/m/Y") }}</td>
+                    <td>Création</td>
+                    <td>Création initiale</td>
+                    <td>1</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Rest of the content remains the same -->
+        </div>
+		</div>
+
+       <div class="export-buttons no-print">
+    <a href="{{ path('app_dashboard') }}" class="btn btn-primary shadow-soft border-light">
+        <i class="fas fa-arrow-left"></i>
+        Retour au tableau de bord
+    </a>
+    <button onclick="window.print()" class="btn btn-primary shadow-soft border-light">
+        <i class="fas fa-print"></i>
+        Imprimer
+    </button>
+    <button onclick="exportToGoogleDrive()" class="btn btn-primary shadow-soft border-light google-drive">
+        <i class="fab fa-google-drive"></i>
+        Exporter vers Google Drive
+    </button>
+    <button onclick="exportToOneDrive()" class="btn btn-primary shadow-soft border-light onedrive">
+        <i class="fab fa-microsoft"></i>
+        Exporter vers OneDrive
+    </button>
+    <button onclick="exportToWord()" class="btn btn-primary shadow-soft border-light word">
+        <i class="fas fa-file-word"></i>
+        Exporter au format Word
+    </button>
+</div>
+    </div>
+
+<!-- Modal pour le titre -->
+<div class="modal fade" id="editTitleModal" style="display: none;" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-primary border-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTitleModalLabel">Modifier le titre</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="editTitleInput">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="saveTitleBtn">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal pour la référence -->
+<div class="modal fade" id="editRefModal" style="display: none;" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-primary border-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editRefModalLabel">Modifier la référence</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" class="form-control" id="editRefInput">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="saveRefBtn">Sauvegarder</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

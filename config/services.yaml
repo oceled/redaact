@@ -1,0 +1,15 @@
+parameters:
+    logos_directory: '%kernel.project_dir%/public/uploads/logos'
+    logos_public_path: '/uploads/logos'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'

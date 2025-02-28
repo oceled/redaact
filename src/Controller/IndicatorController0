@@ -1,0 +1,115 @@
+<?php
+
+namespace App\Controller;
+
+use App\Entity\OrgaInd;
+use App\Entity\IndCrea;
+use App\Repository\OrgaProcRepository;
+use App\Repository\OrgaIndRepository;
+use App\Repository\IndCreaRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
+use Psr\Log\LoggerInterface;
+
+class IndicatorController extends AbstractController
+{
+    #[Route('/indicator/save', name: 'app_indicator_save', methods: ['POST'])]
+public function save(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    LoggerInterface $logger,
+    OrgaIndRepository $orgaIndRepository,
+    IndCreaRepository $IndCreaRepository,
+    OrgaProcRepository $orgaProcRepository
+): JsonResponse {
+    try {
+        $data = json_decode($request->getContent(), true);
+        
+        // Log des données reçues
+        $logger->info('Données reçues pour sauvegarde', [
+            'indNumb' => $data['indNumb'] ?? 'Non défini',
+            'userEmail' => $this->getUser()->getEmail()
+        ]);
+        
+        if (!isset($data['indNumb'])) {
+            throw new \Exception('Numéro d\'indicateur manquant');
+        }
+
+        $indNumb = (int)$data['indNumb'];
+        
+        // Récupérer l'OrgaProc
+        $user = $this->getUser();
+        if (!$user) {
+            throw new \Exception('Utilisateur non connecté');
+        }
+
+        $orgaProc = $orgaProcRepository->findOneBy([
+            'orgaSiret' => $user->getUserInfo()->getOrgaSiret()
+        ]);
+
+        if (!$orgaProc) {
+            throw new \Exception('Procédure non trouvée');
+        }
+
+        // Rechercher l'indicateur existant
+        $indicator = $orgaIndRepository->findOneBy([
+            'indNumb' => $indNumb,
+            'orgaProc' => $orgaProc
+        ]);
+
+        // Créer si n'existe pas
+        if (!$indicator) {
+            $indicator = new OrgaInd();
+            $indicator->setIndNumb($indNumb);
+            $indicator->setOrgaProc($orgaProc);
+        }
+
+        // Mise à jour des données de l'indicateur
+        $indicator->setIndName($data['indName'] ?? '');
+        $indicator->setIndObject($data['indObject'] ?? '');
+        $indicator->setIndVoc($data['indVoc'] ?? '');
+        $indicator->setIndDetail($data['indDetail'] ?? '');
+        $indicator->setIndFiles($data['indFiles'] ?? '');
+        
+        // Si c'est une nouvelle version, créer une nouvelle révision
+        if (isset($data['revision']['type']) && $data['revision']['type'] === 'new') {
+            // Création de la révision
+            $revision = new IndCrea();
+            $revision->setIndicator($indicator);
+            $revision->setIndRedac($data['revision']['indRedac'] ?? 'Non spécifié');
+            $revision->setIndApprob($data['revision']['indApprob'] ?? 'Non spécifié');
+			$entityManager->persist($revision);
+        }
+
+        $entityManager->persist($indicator);
+        $entityManager->flush();
+
+        // Log de succès
+        $logger->info('Sauvegarde réussie', [
+            'indNumb' => $indicator->getIndNumb(),
+            'type' => isset($data['revision']['type']) ? 'nouvelle version' : 'correction'
+        ]);
+
+        return new JsonResponse([
+            'success' => true,
+            'indNumb' => $indicator->getIndNumb(),
+            'type' => isset($data['revision']['type']) ? 'nouvelle version' : 'correction'
+        ]);
+
+    } catch (\Exception $e) {
+        // Log détaillé de l'erreur
+        $logger->error('Erreur lors de la sauvegarde', [
+            'message' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return new JsonResponse([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+}

@@ -1,0 +1,64 @@
+{# templates/registration/step2.html.twig #}
+{% extends 'registration/layout.html.twig' %}
+
+{% block title %}Inscription - Étape 2{% endblock %}
+
+{% block registration_title %}Informations complémentaires{% endblock %}
+
+{% block registration_content %}
+    {{ form_start(orgaInfoForm, {'attr': {'class': 'needs-validation'}}) }}
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgStatus, {
+                'attr': {
+                    'class': 'form-select'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgEmp, {
+                'attr': {
+                    'class': 'form-select'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgCatAct, {
+                'attr': {
+                    'class': 'form-select'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgCert, {
+                'attr': {
+                    'class': 'form-control'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgSubDo, {
+                'attr': {
+                    'class': 'form-control'
+                }
+            }) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_row(orgaInfoForm.orgSubUse, {
+                'attr': {
+                    'class': 'form-control'
+                }
+            }) }}
+        </div>
+
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary">
+                Finaliser l'inscription
+            </button>
+        </div>
+    {{ form_end(orgaInfoForm) }}
+{% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}RED'ACT - Guide des indicateurs{% endblock %}
+
+{% block stylesheets %}
+    {{ encore_entry_link_tags('app') }}
+    <link rel="stylesheet" href="{{ asset('/assets/css/neumorphism.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('/assets/css/dashboard.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {# Bootstrap JS #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {# Scripts de l'application #}
+    <script src="{{ asset('assets/js/notification-manager.js') }}"></script>
+    <script src="{{ asset('assets/js/inddoc-manager.js') }}"></script>
+    <script src="{{ asset('assets/js/inddoc-form-handler.js') }}"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+<!-- Modal pour message "pas de données" -->
+<div class="modal fade" id="noDataModal" tabindex="-1" aria-labelledby="noDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content card bg-primary shadow-soft border-light">
+            <div class="modal-header">
+                <h5 class="modal-title" id="noDataModalLabel">Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Pas de données à afficher pour cet indicateur
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Header -->
+<header class="header-global">
+    <nav id="navig" aria-label="Primary navigation" class="navbar navbar-expand-lg headroom fixed-top navbar-light navbar-theme-primary">
+        <div class="container-fluid">
+            <div class="row align-items-center w-100">
+                <!-- Logo Section -->
+                <div class="col-2">
+                    <a class="navbar-brand d-flex align-items-center" href="{{ path('app_dashboard') }}">
+                        <img src="{{ asset('assets/img/logo_redaact.svg') }}" style="width: 4em; height: 4em;" alt="Logo light">
+                        <span class="h6 mb-0 ms-2" id="brandname">RED'ACT</span>
+                    </a>
+                </div>
+                
+                <!-- Description Section -->
+                <div class="col-6 text-center">
+                    <span class="fs-6 fw-bold">Guide des indicateurs Qualiopi</span>
+                </div>
+                
+                <!-- User Info & Settings Section -->
+                <div class="col-4">
+                    <div class="d-flex align-items-center justify-content-end gap-3">
+                        <!-- User Name -->
+                        <div class="fs-6">
+                            {% if app.user %}
+                                {{ app.user.fullName }}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- User Dropdown -->
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle p-0" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fa-solid fa-circle-user fa-2x"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#infoModal">Vos informations</a></li>
+                                <li><a class="dropdown-item" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Info Icon -->
+                        <div>
+                            <i class="fa-solid fa-circle-info fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<!-- Main Content -->
+<main class="mr-4 ml-4">
+    <!-- Sélecteur d'indicateur -->
+    <div class="row mt-5">
+        <div class="card bg-primary shadow-soft text-center border-light col-md-3 col-lg-2">
+            <div class="align-middle fs-6">Guide indicateur n° <span class="CurrentInd">XX</span></div>
+        </div>
+        <div class="col-md-9 col-lg-10 mt-1">
+            <div class="form-group">
+                <select id="indicatorSelect" class="form-select shadow-soft">
+                    <option value="">Choisir un indicateur...</option>
+                    {% for i in 1..32 %}
+                        {% set num = "%02d"|format(i) %}
+                        {% set isInactive = i in [3, 7, 13, 14, 15, 16, 20] %}
+                        <option value="{{ num }}" 
+                                class="indicator-item {% if isInactive %}inactive{% else %}active{% endif %}"
+                                {% if isInactive %}disabled{% endif %}>
+                            Indicateur {{ num }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Formulaire principal -->
+    <div class="row justify-content-center">
+        <div class="col-md-8 central-content">
+            <form id="documentForm" class="mt-4">
+                <!-- Définition -->
+                <div class="form-group mb-4">
+                    <div class="container card bg-primary shadow-soft border-light p-3">
+                        <label for="indd_def" class="form-label mb-2">Définition du guide de lecture</label>
+                        <textarea class="form-control" 
+                                  id="indd_def" 
+                                  name="indd_def" 
+                                  rows="4"
+                                  placeholder="Pas d'information fournie"></textarea>
+                    </div>
+                </div>
+
+                <!-- Conseils -->
+                <div class="form-group mb-4">
+                    <div class="container card bg-primary shadow-soft border-light p-3">
+                        <label for="indd_adv" class="form-label mb-2">Conseils et bonnes pratiques</label>
+                        <textarea class="form-control" 
+                                  id="indd_adv" 
+                                  name="indd_adv" 
+                                  rows="6"
+                                  placeholder="Pas d'information fournie"></textarea>
+                    </div>
+                </div>
+
+                <!-- Champ caché pour le numéro d'indicateur -->
+                <input type="hidden" id="indd_numb" name="indd_numb">
+
+                <!-- Bouton de soumission -->
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn bg-primary shadow-soft border-light px-5">
+                        <i class="fas fa-save me-2"></i>Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+    window.indDocs = {{ indDocs|map(doc => ({
+        'indd_numb': doc.inddNumb|default(null),
+        'indd_def': doc.inddDef|default(''),
+        'indd_adv': doc.inddAdv|default('')
+    }))|json_encode|raw }};
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialisation du gestionnaire de formulaire
+        if (window.DocFormHandler) {
+            window.docFormHandler = new DocFormHandler();
+        }
+
+        // Initialisation du gestionnaire de documents
+        if (window.DocManager && window.indDocs) {
+            window.docManager = new DocManager(window.indDocs);
+        }
+
+        // Gestion du sélecteur d'indicateur
+        const select = document.getElementById('indicatorSelect');
+        if (select) {
+            select.addEventListener('change', function() {
+                const selectedValue = this.value;
+                if (selectedValue && window.docManager) {
+                    window.docManager.loadDocData(parseInt(selectedValue));
+                }
+            });
+        }
+
+        // Charger le premier indicateur par défaut
+        if (window.docManager) {
+            window.docManager.loadDocData(1);
+        }
+    });
+</script>
+{% endblock %}
