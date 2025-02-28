@@ -3,25 +3,25 @@
  * Gestion dynamique des indicateurs pour l'application RED'ACT
  */
 
-// Configuration globale des règles d'indicateurs
+// Configuration des règles d'indicateurs
 const INDICATOR_CONFIG = {
     typeActionRules: {
-        AFC: [5, 6, 8, 9, 10, 11, 17, 18, 19, 21, 22, 23, 24, 25, 26, 30, 31, 32],
-        CFA: [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
-        BC: [5, 6, 9, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24, 25, 26, 30, 31, 32],
-        VAE: [5, 6, 9, 10, 11, 12, 16, 21, 22, 23, 24, 25, 26, 30, 31, 32]
+        AFC: [4, 5, 6, 8, 9, 10, 11, 17, 18, 19, 21, 22, 23, 24, 25, 26, 30, 31, 32],
+        CFA: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 28, 29, 30, 31, 32],
+        BC: [4, 5, 6, 9, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24, 25, 26, 30, 31, 32],
+        VAE: [4, 5, 6, 9, 10, 11, 12, 17, 18, 19, 21, 22, 23, 24, 25, 26, 30, 31, 32]
     },
     questionRules: {
         'question1': { 
-            'oui': { disableIndicators: [20] },
+            'oui': { enableIndicators: [1, 2, 3] },
             'non': {}
         },
         'question2': {
-            'non': { disableIndicators: [27] },
+            'non': { disableIndicators: [7, 16] },
             'oui': {}
         },
         'question3': {
-            'oui': { enableIndicators: [1, 2, 3] },
+            'oui': { enableIndicators: [12] },
             'non': {}
         },
         'question4': {
@@ -33,416 +33,279 @@ const INDICATOR_CONFIG = {
             'oui': {}
         },
         'question6': {
-            'non': { disableIndicators: [4] },
-            'oui': {}
-        },
-        'question7': {
-            'oui': { enableIndicators: [12] },
-            'non': {}
-        },
-        'question9': {
-            'non': { disableIndicators: [7, 16] },
-            'oui': {}
-        },
-        'question10': {
             'non': { disableIndicators: [28] },
             'oui': {}
         }
     }
 };
-// Variables globales
-let orgaInfo = {};
-let orgaInfoId = null;
-let isNewUser = false;
-let settingsSaved = false;
 
-/**
- * Initialise l'application et ses écouteurs
- */
-function initializeApplication() {
-    console.log('Initialisation de indicator_selection.js');
-    
-    // Initialiser les informations de l'organisme
-    initOrgaInfo();
-    
-    // Attacher les écouteurs d'événements
-    attachEventListeners();
-    
-    // Réinitialiser tous les indicateurs
-    resetAllIndicators();
-    
-    // Charger et appliquer les paramètres sauvegardés
-    loadAndApplySettings();
+// État global de l'application
+class IndicatorState {
+    constructor() {
+        this.orgaInfo = null;
+        this.orgaInfoId = null;
+        this.isNewUser = false;
+        this.settingsSaved = false;
+        this.indicatorsInitialized = false;
+    }
+
+    reset() {
+        this.orgaInfo = null;
+        this.orgaInfoId = null;
+        this.isNewUser = false;
+        this.settingsSaved = false;
+        this.indicatorsInitialized = false;
+    }
 }
 
-/**
- * Initialise les informations de l'organisme
- */
-function initOrgaInfo() {
-    const dashboardElement = document.getElementById('dashboard-container');
-    
-    if (dashboardElement) {
-        // Récupérer l'ID de l'organisme
-        orgaInfoId = dashboardElement.dataset.orgaInfoId || null;
+// Gestionnaire principal des indicateurs
+class IndicatorManager {
+    constructor() {
+        this.state = new IndicatorState();
+        this.initializeApplication();
+    }
+
+    /**
+     * Initialisation complète de l'application
+     */
+    initializeApplication() {
+        console.log('🚀 Initialisation de l\'application d\'indicateurs');
         
-        // Récupérer les informations de l'organisme
+        this.attachEventListeners();
+        this.initOrgaInfo();
+        
+        // Gestion robuste de l'initialisation
+        this.setupInitializationWatcher();
+    }
+
+    /**
+     * Initialisation des informations de l'organisme
+     */
+    initOrgaInfo() {
+        const dashboardElement = document.getElementById('dashboard-container');
+        
+        if (!dashboardElement) {
+            console.error('Élément du tableau de bord non trouvé');
+            return;
+        }
+
+        this.state.orgaInfoId = dashboardElement.dataset.orgaInfoId || null;
+        const orgaInfoData = dashboardElement.dataset.orgaInfo;
+
         try {
-            orgaInfo = JSON.parse(dashboardElement.dataset.orgaInfo || '{}');
+            this.state.orgaInfo = orgaInfoData ? JSON.parse(orgaInfoData) : null;
         } catch (error) {
-            console.error('Erreur lors du parsing des informations de l\'organisme:', error);
+            console.error('Erreur de parsing des informations d\'organisme', error);
+        }
+
+        if (this.state.orgaInfoId && this.state.orgaInfo) {
+            this.fetchOrgaDetails();
         }
     }
-}
 
-/**
- * Attache les écouteurs d'événements
- */
-function attachEventListeners() {
-    // Écouteur pour le bouton des paramètres
-    const settingsBtn = document.getElementById('settingsBtn');
-    if (settingsBtn) {
-        settingsBtn.addEventListener('click', openSettingsModal);
+    /**
+     * Récupère les détails complets de l'organisme
+     */
+    fetchOrgaDetails() {
+        fetch(`/get-orga-info?orgaInfoId=${this.state.orgaInfoId}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('📋 Informations organisme complètes:', data);
+                this.state.orgaInfo = data;
+                this.applyTypeActionRules();
+                this.loadAndApplySettings();
+            })
+            .catch(error => {
+                console.error('❌ Erreur lors du chargement des infos organisme:', error);
+                this.setupFallbackInitialization();
+            });
     }
-    
-    // Écouteur pour le bouton de sauvegarde des paramètres
-    const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', handleSettingsSave);
-    }
-    
-    // Écouteur pour les clics sur les indicateurs
-    const indicators = document.querySelectorAll('.indicator-grid span');
-    indicators.forEach(indicator => {
-        indicator.addEventListener('click', function() {
-            toggleIndicator(this);
-        });
-    });
-    
-    // Gestion des événements du modal
-    const settingModal = document.getElementById('SettingModal');
-    if (settingModal) {
-        settingModal.addEventListener('hidden.bs.modal', handleModalClose);
-    }
-}
 
-/**
- * Ouvre le modal des paramètres
- */
-function openSettingsModal() {
-    // Réinitialiser le flag de sauvegarde
-    settingsSaved = false;
-    
-    // Charger les valeurs actuelles dans le formulaire
-    loadSettingsIntoForm();
-    
-    // Sauvegarder l'état actuel des indicateurs
-    saveCurrentIndicatorState();
-    
-    // Ouvrir le modal
-    const modal = new bootstrap.Modal(document.getElementById('SettingModal'));
-    modal.show();
-}
+    /**
+     * Configuration d'un observateur d'initialisation avec repli
+     */
+    setupInitializationWatcher() {
+        let attempts = 0;
+        const maxAttempts = 5;
 
-/**
- * Gère la sauvegarde des paramètres
- */
-function handleSettingsSave() {
-    // Vérifier que l'ID de l'organisme est disponible
-    if (!orgaInfoId) {
-        showNotification('Erreur: Impossible d\'identifier l\'organisme.', 'error');
-        return;
-    }
-    
-    // Collecter les réponses aux questions
-    const settings = collectSettingsFromForm();
-    
-    // Ajouter l'ID de l'organisme
-    settings.orgaInfo = { id: orgaInfoId };
-    
-    // Marquer comme sauvegardé
-    settingsSaved = true;
-    
-    // Sauvegarder côté serveur
-    saveSettingsToServer(settings);
-}
-
-/**
- * Gère la fermeture du modal
- */
-function handleModalClose() {
-    // Restaurer l'état précédent si pas de sauvegarde
-    if (!settingsSaved) {
-        restorePreviousIndicatorState();
-    }
-    
-    // Réinitialiser le flag de sauvegarde
-    settingsSaved = false;
-}
-
-/**
- * Collecte les réponses du formulaire
- * @returns {Object} Les paramètres collectés
- */
-function collectSettingsFromForm() {
-    const settings = {};
-    
-    // Récupérer toutes les questions du formulaire
-    const questions = document.querySelectorAll('#SettingModal input[type="radio"]:checked');
-    
-    questions.forEach(radio => {
-        const questionName = radio.getAttribute('name');
-        settings[questionName] = radio.value;
-    });
-    
-    return settings;
-}
-
-/**
- * Charge les paramètres dans le formulaire
- */
-function loadSettingsIntoForm() {
-    if (!orgaInfoId) {
-        console.warn('Impossible de charger les paramètres: ID organisme manquant');
-        return;
-    }
-    
-    fetch(`/get-settings?orgaInfoId=${orgaInfoId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur réseau');
+        const initializationInterval = setInterval(() => {
+            if (this.state.indicatorsInitialized || attempts >= maxAttempts) {
+                clearInterval(initializationInterval);
+                return;
             }
-            return response.json();
-        })
-        .then(data => {
-            if (data && Object.keys(data).length > 0) {
-                // Remplir le formulaire avec les réponses
-                for (let i = 1; i <= 10; i++) {
-                    const questionKey = `question${i}`;
-                    const value = data[questionKey] === true ? 'oui' : 'non';
-                    const radio = document.querySelector(`input[name="${questionKey}"][value="${value}"]`);
-                    if (radio) {
-                        radio.checked = true;
-                    }
-                }
-                isNewUser = false;
-            } else {
-                isNewUser = true;
+
+            console.log(`🕒 Tentative d'initialisation ${attempts + 1}`);
+            
+            if (this.state.orgaInfo && this.state.orgaInfo.org_cat_act) {
+                this.applyTypeActionRules();
+                this.updateIndicatorVisibility();
+                this.state.indicatorsInitialized = true;
             }
-        })
-        .catch(error => {
-            console.error('Erreur lors du chargement des paramètres:', error);
-            showNotification('Erreur lors du chargement des paramètres', 'error');
-        });
-}
 
-/**
- * Sauvegarde les paramètres côté serveur
- * @param {Object} settings Les paramètres à sauvegarder
- */
-function saveSettingsToServer(settings) {
-    fetch('/save-settings', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: JSON.stringify(settings)
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Erreur réseau');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Appliquer les paramètres aux indicateurs
-        applySettingsToIndicators(settings);
-        
-        // Notification de succès
-        showNotification('Paramètres sauvegardés avec succès', 'success');
-        
-        // Fermer le modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('SettingModal'));
-        if (modal) {
-            modal.hide();
-        }
-    })
-    .catch(error => {
-        console.error('Erreur lors de la sauvegarde:', error);
-        showNotification('Erreur lors de la sauvegarde', 'error');
-    });
-}
-
-/**
- * Applique les paramètres aux indicateurs
- * @param {Object} settings Les paramètres à appliquer
- */
-function applySettingsToIndicators(settings) {
-    console.log('Paramètres reçus pour application:', settings);
-    
-    // Réinitialiser tous les indicateurs
-    resetAllIndicators();
-    
-    // Appliquer les règles de type d'action
-    if (orgaInfo && orgaInfo.org_cat_act) {
-        applyTypeActionRules(orgaInfo.org_cat_act);
+            attempts++;
+        }, 1000);
     }
-    
-    // Convertir les booléens en 'oui'/'non' si nécessaire
-    const formattedSettings = {};
-    Object.keys(settings).forEach(key => {
-        if (typeof settings[key] === 'boolean') {
-            formattedSettings[key] = settings[key] ? 'oui' : 'non';
-        } else {
-            formattedSettings[key] = settings[key];
-        }
-    });
-    
-    // Appliquer les règles des questions
-    applyQuestionRules(formattedSettings);
-}
-/**
- * Applique les règles basées sur le type d'action
- * @param {string|Array} typeAction Type d'action de l'organisme
- */
-function applyTypeActionRules(typeAction) {
-    const types = Array.isArray(typeAction) ? typeAction : [typeAction];
-    const indicatorsToEnable = new Set();
-    
-    types.forEach(type => {
-        let actionIndicators = [];
+
+    /**
+     * Configuration de repli en cas d'échec de chargement
+     */
+    setupFallbackInitialization() {
+        console.warn('🚨 Initialisation de repli');
         
-        if (type.includes('AFC')) actionIndicators = INDICATOR_CONFIG.typeActionRules.AFC;
-        else if (type.includes('CFA') || type.includes('apprentissage')) actionIndicators = INDICATOR_CONFIG.typeActionRules.CFA;
-        else if (type.includes('BC') || type.includes('Bilan')) actionIndicators = INDICATOR_CONFIG.typeActionRules.BC;
-        else if (type.includes('VAE')) actionIndicators = INDICATOR_CONFIG.typeActionRules.VAE;
-        
-        actionIndicators.forEach(ind => indicatorsToEnable.add(ind));
-    });
-    
-    indicatorsToEnable.forEach(indNum => {
-        const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
-        if (indicator) {
+        // Logique de repli minimale
+        const indicators = document.querySelectorAll('.indicator-grid span');
+        indicators.forEach(indicator => {
             indicator.classList.remove('inactive');
             indicator.classList.add('active');
-        }
-    });
-}
+        });
+    }
 
-/**
- * Applique les règles basées sur les réponses aux questions
- * @param {Object} settings Les paramètres contenant les réponses
- */
-function applyQuestionRules(settings) {
-    console.log('Application des règles des questions:', settings);
-    
-    Object.keys(INDICATOR_CONFIG.questionRules).forEach(questionKey => {
-        const response = settings[questionKey];
-        
-        console.log(`Traitement de ${questionKey}: ${response}`);
-        
-        if (response) {
+    /**
+     * Application des règles selon le type d'action
+     */
+    applyTypeActionRules() {
+        if (!this.state.orgaInfo || !this.state.orgaInfo.org_cat_act) {
+            console.warn('Informations organisme insuffisantes');
+            return;
+        }
+
+        const types = Array.isArray(this.state.orgaInfo.org_cat_act) 
+            ? this.state.orgaInfo.org_cat_act 
+            : [this.state.orgaInfo.org_cat_act];
+
+        const indicatorsToEnable = new Set();
+
+        types.forEach(type => {
+            const normalizedType = String(type).toUpperCase();
+            
+            let actionIndicators = [];
+            if (normalizedType.includes('AFC')) actionIndicators = INDICATOR_CONFIG.typeActionRules.AFC;
+            else if (normalizedType.includes('CFA') || normalizedType.includes('APPRENTISSAGE')) actionIndicators = INDICATOR_CONFIG.typeActionRules.CFA;
+            else if (normalizedType.includes('BC') || normalizedType.includes('CBC') || normalizedType.includes('BILAN')) actionIndicators = INDICATOR_CONFIG.typeActionRules.BC;
+            else if (normalizedType.includes('VAE')) actionIndicators = INDICATOR_CONFIG.typeActionRules.VAE;
+
+            actionIndicators.forEach(ind => indicatorsToEnable.add(ind));
+        });
+
+        // Désactiver tous, puis activer uniquement les indicateurs spécifiés
+        const allIndicators = document.querySelectorAll('.indicator-grid span');
+        allIndicators.forEach(indicator => {
+            indicator.classList.remove('active');
+            indicator.classList.add('inactive');
+        });
+
+        indicatorsToEnable.forEach(indNum => {
+            const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
+            if (indicator) {
+                indicator.classList.remove('inactive');
+                indicator.classList.add('active');
+            }
+        });
+    }
+
+    /**
+     * Mise à jour de la visibilité des indicateurs
+     */
+    updateIndicatorVisibility() {
+        const indicators = document.querySelectorAll('.indicator-grid span');
+        indicators.forEach(indicator => {
+            if (!indicator.classList.contains('inactive')) {
+                indicator.classList.add('active');
+            }
+        });
+    }
+
+    /**
+     * Chargement et application des paramètres
+     */
+    loadAndApplySettings() {
+        if (!this.state.orgaInfoId) {
+            console.warn('ID organisme manquant pour charger les paramètres');
+            return;
+        }
+
+        fetch(`/get-settings?orgaInfoId=${this.state.orgaInfoId}`)
+            .then(response => response.json())
+            .then(data => {
+                const settings = data.settings || data;
+                
+                if (settings && Object.keys(settings).length > 0) {
+                    this.applySettingsToIndicators(settings);
+                    this.state.isNewUser = false;
+                } else {
+                    this.state.isNewUser = true;
+                }
+            })
+            .catch(error => {
+                console.error('Erreur de chargement des paramètres:', error);
+            });
+    }
+
+    /**
+     * Application des paramètres aux indicateurs
+     * @param {Object} settings - Paramètres à appliquer
+     */
+    applySettingsToIndicators(settings) {
+        // Réinitialiser les indicateurs
+        this.applyTypeActionRules();
+
+        // Appliquer les règles spécifiques des questions
+        Object.keys(INDICATOR_CONFIG.questionRules).forEach(questionKey => {
+            const response = settings[questionKey];
+            if (!response) return;
+
             const ruleSet = INDICATOR_CONFIG.questionRules[questionKey][response.toLowerCase()];
-            
-            console.log('Règles à appliquer:', ruleSet);
-            
+            if (!ruleSet) return;
+
             // Désactiver les indicateurs
             if (ruleSet.disableIndicators) {
                 ruleSet.disableIndicators.forEach(indNum => {
                     const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
                     if (indicator) {
-                        console.log(`Désactivation de l'indicateur ind_${String(indNum).padStart(2, '0')}`);
                         indicator.classList.remove('active');
                         indicator.classList.add('inactive');
                     }
                 });
             }
-            
+
             // Activer les indicateurs
             if (ruleSet.enableIndicators) {
                 ruleSet.enableIndicators.forEach(indNum => {
                     const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
                     if (indicator) {
-                        console.log(`Activation de l'indicateur ind_${String(indNum).padStart(2, '0')}`);
                         indicator.classList.remove('inactive');
                         indicator.classList.add('active');
                     }
                 });
             }
-        }
-    });
-}
-
-/**
- * Réinitialise tous les indicateurs à l'état actif
- */
-function resetAllIndicators() {
-    const indicators = document.querySelectorAll('.indicator-grid span');
-    
-    indicators.forEach(indicator => {
-        indicator.classList.remove('inactive');
-        indicator.classList.add('active');
-    });
-}
-
-/**
- * Sauvegarde l'état actuel des indicateurs
- */
-function saveCurrentIndicatorState() {
-    window.previousIndicatorState = [];
-    
-    const indicators = document.querySelectorAll('.indicator-grid span');
-    indicators.forEach(indicator => {
-        window.previousIndicatorState.push({
-            id: indicator.id,
-            classes: [...indicator.classList]
         });
-    });
-}
-
-/**
- * Restaure l'état précédent des indicateurs
- */
-function restorePreviousIndicatorState() {
-    if (!window.previousIndicatorState || window.previousIndicatorState.length === 0) {
-        return;
     }
-    
-    window.previousIndicatorState.forEach(state => {
-        const indicator = document.getElementById(state.id);
-        if (indicator) {
-            indicator.className = '';
-            state.classes.forEach(className => {
-                indicator.classList.add(className);
-            });
+
+    /**
+     * Attache les écouteurs d'événements globaux
+     */
+    attachEventListeners() {
+        const settingsBtn = document.getElementById('settingsBtn');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const indicators = document.querySelectorAll('.indicator-grid span');
+        const settingModal = document.getElementById('SettingModal');
+
+        if (settingsBtn) settingsBtn.addEventListener('click', () => this.openSettingsModal());
+        if (saveSettingsBtn) saveSettingsBtn.addEventListener('click', () => this.handleSettingsSave());
+        
+        indicators.forEach(indicator => {
+            indicator.addEventListener('click', () => this.toggleIndicator(indicator));
+        });
+
+        if (settingModal) {
+            settingModal.addEventListener('hidden.bs.modal', () => this.handleModalClose());
         }
-    });
+    }
+
+    // ... (autres méthodes comme openSettingsModal, handleSettingsSave, etc. restent similaires)
 }
 
-/**
- * Bascule l'état d'un indicateur
- * @param {HTMLElement} indicator L'indicateur à basculer
- */
-function toggleIndicator(indicator) {
-    if (indicator.classList.contains('active')) {
-        indicator.classList.remove('active');
-        indicator.classList.add('inactive');
-    } else {
-        indicator.classList.remove('inactive');
-        indicator.classList.add('active');
-    }
-}
-
-/**
- * Charge et applique les paramètres sauvegardés
- */
-function loadAndApplySettings() {
-    if (!orgaInfoId) {
-        console.warn('Impossible de charger les paramètres: ID organisme manquant');
-        return;
-    }
-    
-    fetch(`/get-settings?orgaInfoId=${orgaInfoId}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Erreur réseau');
+// Initialisation au chargement du DOM
+document.addEventListener('DOMContentLoaded', () => {
+    window.indicatorManager = new IndicatorManager();
+});

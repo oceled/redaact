@@ -201,140 +201,98 @@
     </div>
 </div>
 <div class="modal fade" id="SettingModal" tabindex="-1" aria-labelledby="SettingModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="SettingModalLabel">Paramètres</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="mb-4">
-						<p class="fw-bold">Êtes prestataire indépendant ( vous assurez seul les différentes fonctions) ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question1" id="q1-oui" value="oui">
-							<label class="form-check-label" for="q1-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question1" id="q1-non" value="non">
-							<label class="form-check-label" for="q1-non">Non</label>
-						</div>
-					</div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SettingModalLabel">Paramètres</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Question 1 -->
+                <div class="mb-4">
+                    <p class="fw-bold">1. Réalisez-vous, uniquement, des prestations pour le compte d'un autre organisme de formation ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question1" id="q1-oui" value="oui">
+                        <label class="form-check-label" for="q1-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question1" id="q1-non" value="non">
+                        <label class="form-check-label" for="q1-non">Non</label>
+                    </div>
+                </div>
 
-					<div class="mb-4">
-						<p class="fw-bold">Faîtes vous appel à la sous-traitance ou au portage salarial ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question2" id="q2-oui" value="oui">
-							<label class="form-check-label" for="q2-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question2" id="q2-non" value="non">
-							<label class="form-check-label" for="q2-non">Non</label>
-						</div>
-					</div>
+                <!-- Question 2 -->
+                <div class="mb-4">
+                    <p class="fw-bold">2. Proposez-vous des prestations de formation continue conduisant à une certification ou habilitation ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question2" id="q2-oui" value="oui">
+                        <label class="form-check-label" for="q2-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question2" id="q2-non" value="non">
+                        <label class="form-check-label" for="q2-non">Non</label>
+                    </div>
+                </div>
 
-					<div class="mb-4">
-						<p class="fw-bold">Réalisez-vous , uniquement, des prestations pour le compte d'un autre organisme de formation ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question3" id="q3-oui" value="oui">
-							<label class="form-check-label" for="q3-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question3" id="q3-non" value="non">
-							<label class="form-check-label" for="q3-non">Non</label>
-						</div>
-					</div>
+                <!-- Question 3 -->
+                <div class="mb-4">
+                    <p class="fw-bold">3. Proposez-vous des prestations d'une durée inférieure à 2 jours ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question3" id="q3-oui" value="oui">
+                        <label class="form-check-label" for="q3-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question3" id="q3-non" value="non">
+                        <label class="form-check-label" for="q3-non">Non</label>
+                    </div>
+                </div>
 
-					<div class="mb-4">
-						<p class="fw-bold">Réalisez-vous des formations par alternance ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question4" id="q4-oui" value="oui">
-							<label class="form-check-label" for="q4-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question4" id="q4-non" value="non">
-							<label class="form-check-label" for="q4-non">Non</label>
-						</div>
-					</div>
+                <!-- Question 4 -->
+                <div class="mb-4">
+                    <p class="fw-bold">4. Réalisez-vous des formations par alternance ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question4" id="q4-oui" value="oui">
+                        <label class="form-check-label" for="q4-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question4" id="q4-non" value="non">
+                        <label class="form-check-label" for="q4-non">Non</label>
+                    </div>
+                </div>
 
-					<div class="mb-4">
-						<p class="fw-bold">Faites vous appel à la sous-traitance ou au portage salarial pour réaliser les prestations ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question5" id="q5-oui" value="oui">
-							<label class="form-check-label" for="q5-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question5" id="q5-non" value="non">
-							<label class="form-check-label" for="q5-non">Non</label>
-						</div>
-					</div>
+                <!-- Question 5 -->
+                <div class="mb-4">
+                    <p class="fw-bold">5. Faites vous appel à la sous-traitance ou au portage salarial pour réaliser les prestations ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question5" id="q5-oui" value="oui">
+                        <label class="form-check-label" for="q5-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question5" id="q5-non" value="non">
+                        <label class="form-check-label" for="q5-non">Non</label>
+                    </div>
+                </div>
 
-					<div class="mb-4">
-						<p class="fw-bold">Êtes-vous responsable de l'analyse du besoin du bénéficiaire ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question6" id="q6-oui" value="oui">
-							<label class="form-check-label" for="q6-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question6" id="q6-non" value="non">
-							<label class="form-check-label" for="q6-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des prestations  d’une durée inférieure à 2 jours ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question7" id="q7-oui" value="oui">
-							<label class="form-check-label" for="q7-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question7" id="q7-non" value="non">
-							<label class="form-check-label" for="q7-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Êtes-vous responsable de l'analyse du besoin du bénéficiaire ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question8" id="q8-oui" value="oui">
-							<label class="form-check-label" for="q8-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question8" id="q8-non" value="non">
-							<label class="form-check-label" for="q8-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des prestations  de formation continue conduisant à une certification ou habilitation ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question9" id="q9-oui" value="oui">
-							<label class="form-check-label" for="q9-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question9" id="q9-non" value="non">
-							<label class="form-check-label" for="q9-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des formations comprenant des périodes en entreprises (stages, AFEST, …) ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question10" id="q10-oui" value="oui">
-							<label class="form-check-label" for="q10-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question10" id="q10-non" value="non">
-							<label class="form-check-label" for="q10-non">Non</label>
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-					<button type="button" class="btn btn-primary" id="saveSettings">Enregistrer</button>
-				</div>
-			</div>
-		</div>
-	</div>
+                <!-- Question 6 -->
+                <div class="mb-4">
+                    <p class="fw-bold">6. Proposez-vous des formations comprenant des périodes en entreprises (stages, AFEST, ...) ?</p>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question6" id="q6-oui" value="oui">
+                        <label class="form-check-label" for="q6-oui">Oui</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="question6" id="q6-non" value="non">
+                        <label class="form-check-label" for="q6-non">Non</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="saveSettings">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
 	<!-- Modal pour l'aide -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
@@ -418,7 +376,11 @@
     </div>
 </div>
             <!-- Main content -->
-<main class="mr-4 ml-4" id="dashboard-container" data-orga-info-id="{{ app.user.userInfo.orgaInfo.id|default(3) }}">
+<main class="mr-4 ml-4" id="dashboard-container" 
+      data-orga-info-id="{{ app.user.userInfo.orgaInfo.id|default(3) }}" 
+      data-orga-info='{{ {
+          "org_cat_act": app.user.userInfo.orgaInfo.orgCatAct|default([])|json_encode()|raw
+      }|json_encode()|raw }}'>
 	<div class="row mt-5">
 		<div class="card bg-primary shadow-soft text-center border-light col-md-3 col-lg-1 d-md-block ">
 			<div class="align-middle fs-6">Vos indicateurs</div>

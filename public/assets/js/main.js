@@ -1,24 +1,18 @@
 // Attendre que le DOM soit complètement chargé
 document.addEventListener('DOMContentLoaded', function() {
     try {
-        // Vérifier si window.indicators existe (chargé depuis le template Twig)
-        console.log('Démarrage de l\'application...');
-        
+        // Vérifier d'abord si indicator_selection a terminé son initialisation
         if (window.indicators) {
             console.log('Indicateurs trouvés, initialisation du gestionnaire...');
-            window.indicatorManager = new IndicatorManager(window.indicators);
+            // Attendre un peu que indicator_selection termine
+            setTimeout(() => {
+                window.indicatorManager = new IndicatorManager(window.indicators);
+            }, 500);
         } else {
             console.warn('Aucun indicateur trouvé dans window.indicators');
         }
-
-        // Initialiser le gestionnaire de formulaire si le formulaire existe
-        if (document.getElementById('indicatorForm')) {
-            console.log('Formulaire trouvé, initialisation du gestionnaire de formulaire...');
-            window.formHandler = new FormHandler();
-        } else {
-            console.warn('Formulaire non trouvé dans le DOM');
-        }
-
+        
+        // ... autre code ...
     } catch (error) {
         console.error('Erreur lors de l\'initialisation de l\'application:', error);
     }

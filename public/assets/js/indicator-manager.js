@@ -2,28 +2,29 @@
 if (!window.IndicatorManager) {
     class IndicatorManager {
         constructor(indicators) {
-            this.indicators = indicators || [];
-            this.indDocs = window.indDocs || [];
-            this.emptyValues = [
-                null,
-                undefined,
-                '',
-                '<p><br></p>',
-                '<p></p>',
-                'Pas d\'information fournie'
-            ];
-            
-            this.initEventListeners();
-            
-            const checkQuill = () => {
-                if (window.quillManager && window.quillManager.editors['indObject']) {
-                    this.loadIndicatorData(1);
-                } else {
-                    setTimeout(checkQuill, 100);
-                }
-            };
-            checkQuill();
-        }
+			this.indicators = indicators || [];
+			this.indDocs = window.indDocs || [];
+			this.emptyValues = [
+				null,
+				undefined,
+				'',
+				'<p><br></p>',
+				'<p></p>',
+				'Pas d\'information fournie'
+			];
+			
+			this.initEventListeners();
+			
+			const checkQuill = () => {
+				if (window.quillManager && window.quillManager.editors['indObject']) {
+					// Charger les données mais ne pas modifier l'état actif/inactif
+					this.loadIndicatorData(1, true); // true signifie "ne pas toucher à l'état actif/inactif"
+				} else {
+					setTimeout(checkQuill, 100);
+				}
+			};
+			checkQuill();
+		}
 
         isFieldEmpty(value) {
             return !value || 
@@ -45,17 +46,24 @@ if (!window.IndicatorManager) {
             });
         }
 
-        loadIndicatorData(indNumber) {
-            indNumber = parseInt(indNumber);
-            const indicator = this.indicators.find(ind => parseInt(ind.indNumb) === indNumber);
-            const indDoc = this.indDocs.find(doc => parseInt(doc.inddNumb) === indNumber);
-            
-            document.querySelector('.CurrentInd').textContent = String(indNumber).padStart(2, '0');
-            
-            this.updateFormFields(indicator, indNumber);
-            this.updateAccordionContents(indDoc);
-            this.updateSelectedIndicator(indNumber);
-        }
+        loadIndicatorData(indNumber, preserveActiveState = false) {
+			indNumber = parseInt(indNumber);
+			const indicator = this.indicators.find(ind => parseInt(ind.indNumb) === indNumber);
+			const indDoc = this.indDocs.find(doc => parseInt(doc.inddNumb) === indNumber);
+			
+			document.querySelector('.CurrentInd').textContent = String(indNumber).padStart(2, '0');
+			
+			this.updateFormFields(indicator, indNumber);
+			this.updateAccordionContents(indDoc);
+			
+			// Mise à jour de la sélection mais sans toucher aux états actif/inactif si preserveActiveState est true
+			document.querySelectorAll('.indicator-grid span').forEach(indicator => {
+				indicator.classList.remove('selected');
+				if (parseInt(indicator.getAttribute('data-indicator')) === indNumber) {
+					indicator.classList.add('selected');
+				}
+			});
+		}
 
         updateFormFields(indicator, indNumber) {
             if (!window.quillManager) return;
@@ -111,14 +119,15 @@ if (!window.IndicatorManager) {
         }
 
         updateSelectedIndicator(indNumber) {
-            // Mise à jour de la sélection visuelle dans la grille
-            document.querySelectorAll('.indicator-grid span').forEach(indicator => {
-                indicator.classList.remove('selected');
-                if (parseInt(indicator.getAttribute('data-indicator')) === indNumber) {
-                    indicator.classList.add('selected');
-                }
-            });
-        }
+			// Mise à jour de la sélection visuelle dans la grille sans toucher aux états actif/inactif
+			document.querySelectorAll('.indicator-grid span').forEach(indicator => {
+				indicator.classList.remove('selected');
+				if (parseInt(indicator.getAttribute('data-indicator')) === indNumber) {
+					indicator.classList.add('selected');
+					// Ne pas toucher aux classes active/inactive ici
+				}
+			});
+		}
     }
 
     window.IndicatorManager = IndicatorManager;
