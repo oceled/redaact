@@ -30,24 +30,7 @@ class IndicatorSettings
     #[ORM\Column(type: 'boolean', nullable: true)]
     private ?bool $question4 = null;
 
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question5 = null;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question6 = null;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question7 = null;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question8 = null;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question9 = null;
-
-    #[ORM\Column(type: 'boolean', nullable: true)]
-    private ?bool $question10 = null;
-
+    // Méthodes getters et setters standards
     public function getId(): ?int
     {
         return $this->id;
@@ -58,162 +41,76 @@ class IndicatorSettings
         return $this->orgaInfo;
     }
 
-    public function setOrgaInfo(?OrgaInfo $orgaInfo): static
+    public function setOrgaInfo(?OrgaInfo $orgaInfo): self
     {
         $this->orgaInfo = $orgaInfo;
         return $this;
     }
 
-    public function getQuestion1(): ?bool
+    // Getters et setters génériques pour éviter la répétition
+    public function getQuestion(int $number): ?bool
     {
-        return $this->question1;
+        $method = 'question' . $number;
+        return $this->$method;
     }
 
-    public function setQuestion1(?bool $question1): static
+    public function setQuestion(int $number, ?bool $value): self
     {
-        $this->question1 = $question1;
+        $method = 'setQuestion' . $number;
+        $this->$method($value);
         return $this;
     }
 
-    public function getQuestion2(): ?bool
-    {
-        return $this->question2;
-    }
-
-    public function setQuestion2(?bool $question2): static
-    {
-        $this->question2 = $question2;
-        return $this;
-    }
-
-    public function getQuestion3(): ?bool
-    {
-        return $this->question3;
-    }
-
-    public function setQuestion3(?bool $question3): static
-    {
-        $this->question3 = $question3;
-        return $this;
-    }
-
-    public function getQuestion4(): ?bool
-    {
-        return $this->question4;
-    }
-
-    public function setQuestion4(?bool $question4): static
-    {
-        $this->question4 = $question4;
-        return $this;
-    }
-
-    public function getQuestion5(): ?bool
-    {
-        return $this->question5;
-    }
-
-    public function setQuestion5(?bool $question5): static
-    {
-        $this->question5 = $question5;
-        return $this;
-    }
-
-    public function getQuestion6(): ?bool
-    {
-        return $this->question6;
-    }
-
-    public function setQuestion6(?bool $question6): static
-    {
-        $this->question6 = $question6;
-        return $this;
-    }
-
-    public function getQuestion7(): ?bool
-    {
-        return $this->question7;
-    }
-
-    public function setQuestion7(?bool $question7): static
-    {
-        $this->question7 = $question7;
-        return $this;
-    }
-
-    public function getQuestion8(): ?bool
-    {
-        return $this->question8;
-    }
-
-    public function setQuestion8(?bool $question8): static
-    {
-        $this->question8 = $question8;
-        return $this;
-    }
-
-    public function getQuestion9(): ?bool
-    {
-        return $this->question9;
-    }
-
-    public function setQuestion9(?bool $question9): static
-    {
-        $this->question9 = $question9;
-        return $this;
-    }
-
-    public function getQuestion10(): ?bool
-    {
-        return $this->question10;
-    }
-
-    public function setQuestion10(?bool $question10): static
-    {
-        $this->question10 = $question10;
-        return $this;
-    }
+    // Méthodes individuelles pour compatibilité
+    public function getQuestion1(): ?bool { return $this->question1; }
+    public function setQuestion1(?bool $question1): self { $this->question1 = $question1; return $this; }
+    public function getQuestion2(): ?bool { return $this->question2; }
+    public function setQuestion2(?bool $question2): self { $this->question2 = $question2; return $this; }
+    public function getQuestion3(): ?bool { return $this->question3; }
+    public function setQuestion3(?bool $question3): self { $this->question3 = $question3; return $this; }
+    public function getQuestion4(): ?bool { return $this->question4; }
+    public function setQuestion4(?bool $question4): self { $this->question4 = $question4; return $this; }
 
     /**
      * Convertit les réponses en format JSON pour l'API
-     * 
-     * @return array
      */
     public function toArray(): array
     {
-        return [
-            'question1' => $this->question1 ? 'oui' : 'non',
-            'question2' => $this->question2 ? 'oui' : 'non',
-            'question3' => $this->question3 ? 'oui' : 'non',
-            'question4' => $this->question4 ? 'oui' : 'non',
-            'question5' => $this->question5 ? 'oui' : 'non',
-            'question6' => $this->question6 ? 'oui' : 'non',
-            'question7' => $this->question7 ? 'oui' : 'non',
-            'question8' => $this->question8 ? 'oui' : 'non',
-            'question9' => $this->question9 ? 'oui' : 'non',
-            'question10' => $this->question10 ? 'oui' : 'non',
-        ];
+        $result = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $getter = "getQuestion{$i}";
+            $result["question{$i}"] = $this->$getter() ? 'oui' : 'non';
+        }
+        return $result;
     }
 
     /**
      * Met à jour l'entité à partir des données JSON de l'API
-     * 
-     * @param array $data Données au format ['question1' => 'oui', 'question2' => 'non', etc.]
-     * @return self
      */
     public function fromArray(array $data): self
     {
-        $this->setQuestion1(isset($data['question1']) ? $data['question1'] === 'oui' : null);
-        $this->setQuestion2(isset($data['question2']) ? $data['question2'] === 'oui' : null);
-        $this->setQuestion3(isset($data['question3']) ? $data['question3'] === 'oui' : null);
-        $this->setQuestion4(isset($data['question4']) ? $data['question4'] === 'oui' : null);
-        $this->setQuestion5(isset($data['question5']) ? $data['question5'] === 'oui' : null);
-        $this->setQuestion6(isset($data['question6']) ? $data['question6'] === 'oui' : null);
-        $this->setQuestion7(isset($data['question7']) ? $data['question7'] === 'oui' : null);
-        $this->setQuestion8(isset($data['question8']) ? $data['question8'] === 'oui' : null);
-        $this->setQuestion9(isset($data['question9']) ? $data['question9'] === 'oui' : null);
-        $this->setQuestion10(isset($data['question10']) ? $data['question10'] === 'oui' : null);
+        for ($i = 1; $i <= 4; $i++) {
+            $questionKey = "question{$i}";
+            $setter = "setQuestion{$i}";
+            
+            if (isset($data[$questionKey])) {
+                $this->$setter($data[$questionKey] === 'oui');
+            }
+        }
         
         return $this;
+    }
+
+    /**
+     * Convertit les valeurs de l'entité en booléens
+     */
+    public function toBooleanArray(): array
+    {
+        $result = [];
+        for ($i = 1; $i <= 4; $i++) {
+            $getter = "getQuestion{$i}";
+            $result["question{$i}"] = $this->$getter();
+        }
+        return $result;
     }
 }

@@ -5,6 +5,10 @@
 {
     box-shadow: 6px 6px 12px #b8b9be,-6px -6px 12px #fff;
 }
+.navbar-theme-primary {
+	padding-bottom: 1em;
+	padding-top: 1em;
+}
 .lifonc {
 	list-style : none;
 }
@@ -39,3 +43,13 @@ margin-right: 20px;
     padding-bottom: 10px;
 }
 /*** Pricing End ***/
+
+@media (min-width: 768px) {
+.keep-mb-md-0 {
+        margin-bottom: 3rem !important;
+    }
+}
+label.required + ul li {
+	font-weight: bolder;
+	color: red;
+}

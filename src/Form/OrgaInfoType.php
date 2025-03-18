@@ -20,15 +20,18 @@ class OrgaInfoType extends AbstractType
             ->add('orgStatus', ChoiceType::class, [
                 'label' => 'Statut de l\'organisation',
                 'choices' => [
-                    'SARL' => 'SARL',
+                    'Auto-entrepreneur' => 'Auto-entrepreneur',
+					'Entreprise Individuelle' => 'Entreprise Individuelle',
+					'SARL' => 'SARL',
                     'SAS' => 'SAS',
+					'SA' => 'SA',
                     'EURL' => 'EURL',
                     'SASU' => 'SASU',
                     'EIRL' => 'EIRL',
-                    'Micro-entreprise' => 'Micro-entreprise',
+                    'SNC (Société en Nom Collectif)' => 'SNC (Société en Nom Collectif)',
                     'Association' => 'Association',
                     'Coopérative (CAE)' => 'CAE',
-                    'Portage salarial' => 'Portage'
+                    'Portage salarial' => 'Portage Portage salarial'
                 ],
                 'constraints' => [
                     new NotBlank([
@@ -65,7 +68,7 @@ class OrgaInfoType extends AbstractType
 				],
 			])
             ->add('orgCert', ChoiceType::class, [
-                'label' => 'Certification',
+                'label' => 'Vos formations conduisent-elles à une certification ?, si oui, cochez la/les catégorie\(s) ',
                 'choices' => [
                     'RNCP' => 'RNCP',
                     'RS' => 'RS'
@@ -75,18 +78,8 @@ class OrgaInfoType extends AbstractType
                 'mapped' => false,
 				'required' => false, // Permet au champ d'être null
 			])
-            ->add('orgSubDo', ChoiceType::class, [
-				'label' => 'Prestation en sous-traitance ',
-				'choices' => [
-					'Oui' => true,
-					'Non' => false
-				],
-				'expanded' => true,  // Ajoute cette ligne pour avoir des radio buttons
-				'multiple' => false, // S'assure qu'un seul choix est possible
-				'required' => true,  // Force la sélection d'une option
-			])
-			->add('orgSubUse', ChoiceType::class, [
-				'label' => 'Recours à la sous-traitance',
+            ->add('orgSubUse', ChoiceType::class, [
+				'label' => 'Avez-vous recours à la sous-traitance ?',
 				'choices' => [
 					'Oui' => true,
 					'Non' => false

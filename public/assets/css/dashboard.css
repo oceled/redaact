@@ -322,3 +322,21 @@ span.inactive.selected {
 #helpModal .modal-dialog {
     max-width: 800px;
 }
+/* Par défaut, masquer les questions spécifiques à AFC */
+.afc-only-question {
+    display: none;
+}
+
+/* Classe à ajouter via JavaScript lorsque AFC est détecté */
+.afc-selected .afc-only-question {
+    display: block;
+}
+/* Styles pour les questions conditionnelles */
+.question-container.d-none {
+  display: none !important;
+}
+
+/* Conserver la compatibilité avec l'ancienne méthode */
+#SettingModal .modal-body:not(.afc-selected) .afc-only {
+  display: none;
+}

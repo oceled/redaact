@@ -1,5 +1,5 @@
 {% extends 'base.html.twig' %}
-{% block title %}RED'ACT{% endblock %}
+{% block title %}REDA'ACT{% endblock %}
 {% block javascripts %}
     {{ parent() }}
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
@@ -183,16 +183,6 @@
                     {% endif %}
                     </p>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label">Prestation en sous-traitance</label>
-                    <p class="rounded border bg-secondary-subtle p_answer p-2">
-                    {% if app.user and app.user.userInfo and app.user.userInfo.orgaInfo %}
-                        {{ app.user.userInfo.orgaInfo.orgSubDo ? 'Oui' : 'Non' }}
-                    {% else %}
-                        Non défini
-                    {% endif %}
-                    </p>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
@@ -200,142 +190,72 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
 <div class="modal fade" id="SettingModal" tabindex="-1" aria-labelledby="SettingModalLabel" aria-hidden="true">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title" id="SettingModalLabel">Paramètres</h5>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body">
-					<div class="mb-4">
-						<p class="fw-bold">Êtes prestataire indépendant ( vous assurez seul les différentes fonctions) ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question1" id="q1-oui" value="oui">
-							<label class="form-check-label" for="q1-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question1" id="q1-non" value="non">
-							<label class="form-check-label" for="q1-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Faîtes vous appel à la sous-traitance ou au portage salarial ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question2" id="q2-oui" value="oui">
-							<label class="form-check-label" for="q2-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question2" id="q2-non" value="non">
-							<label class="form-check-label" for="q2-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Réalisez-vous , uniquement, des prestations pour le compte d'un autre organisme de formation ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question3" id="q3-oui" value="oui">
-							<label class="form-check-label" for="q3-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question3" id="q3-non" value="non">
-							<label class="form-check-label" for="q3-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Réalisez-vous des formations par alternance ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question4" id="q4-oui" value="oui">
-							<label class="form-check-label" for="q4-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question4" id="q4-non" value="non">
-							<label class="form-check-label" for="q4-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Faites vous appel à la sous-traitance ou au portage salarial pour réaliser les prestations ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question5" id="q5-oui" value="oui">
-							<label class="form-check-label" for="q5-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question5" id="q5-non" value="non">
-							<label class="form-check-label" for="q5-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Êtes-vous responsable de l'analyse du besoin du bénéficiaire ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question6" id="q6-oui" value="oui">
-							<label class="form-check-label" for="q6-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question6" id="q6-non" value="non">
-							<label class="form-check-label" for="q6-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des prestations  d’une durée inférieure à 2 jours ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question7" id="q7-oui" value="oui">
-							<label class="form-check-label" for="q7-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question7" id="q7-non" value="non">
-							<label class="form-check-label" for="q7-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Êtes-vous responsable de l'analyse du besoin du bénéficiaire ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question8" id="q8-oui" value="oui">
-							<label class="form-check-label" for="q8-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question8" id="q8-non" value="non">
-							<label class="form-check-label" for="q8-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des prestations  de formation continue conduisant à une certification ou habilitation ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question9" id="q9-oui" value="oui">
-							<label class="form-check-label" for="q9-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question9" id="q9-non" value="non">
-							<label class="form-check-label" for="q9-non">Non</label>
-						</div>
-					</div>
-
-					<div class="mb-4">
-						<p class="fw-bold">Proposez-vous des formations comprenant des périodes en entreprises (stages, AFEST, …) ?</p>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question10" id="q10-oui" value="oui">
-							<label class="form-check-label" for="q10-oui">Oui</label>
-						</div>
-						<div class="form-check form-check-inline">
-							<input class="form-check-input" type="radio" name="question10" id="q10-non" value="non">
-							<label class="form-check-label" for="q10-non">Non</label>
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-					<button type="button" class="btn btn-primary" id="saveSettings">Enregistrer</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal pour l'aide -->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="SettingModalLabel">Paramètres</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+    <!-- Question 1  -->
+    <div class="question-container mb-4" data-question-id="question1">
+        <p class="fw-bold">1. Réalisez-vous, uniquement, des prestations pour le compte d'un autre organisme de formation ?</p>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question1" id="q1-oui" value="oui">
+            <label class="form-check-label" for="q1-oui">Oui</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question1" id="q1-non" value="non">
+            <label class="form-check-label" for="q1-non">Non</label>
+        </div>
+    </div>
+    <!-- Question 2  -->
+    <div class="question-container mb-4 afc-only-question" data-question-id="question2">
+        <p class="fw-bold">2. Proposez-vous, uniquement, des prestations d'une durée inférieure à 2 jours ?</p>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question2" id="q2-oui" value="oui">
+            <label class="form-check-label" for="q2-oui">Oui</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question2" id="q2-non" value="non">
+            <label class="form-check-label" for="q2-non">Non</label>
+        </div>
+    </div>
+    <!-- Question 3 -->
+    <div class="question-container mb-4 afc-only-question" data-question-id="question3">
+        <p class="fw-bold">3. Proposez-vous des formations comprenant des périodes en entreprises (stages, AFEST, ...) ?</p>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question3" id="q3-oui" value="oui">
+            <label class="form-check-label" for="q3-oui">Oui</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="question3" id="q3-non" value="non">
+            <label class="form-check-label" for="q3-non">Non</label>
+        </div>
+    </div>
+    <!-- Question de certification (à ajouter) -->
+    <div class="question-container mb-4" data-question-id="certification">
+        <p class="fw-bold">4. Proposez-vous des formations certifiantes ou diplômantes ?</p>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="certification" id="cert-oui" value="oui">
+            <label class="form-check-label" for="cert-oui">Oui</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="certification" id="cert-non" value="non">
+            <label class="form-check-label" for="cert-non">Non</label>
+        </div>
+    </div>
+</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <button type="button" class="btn btn-primary" id="saveSettings">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal pour l'aide -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content bg-primary border-light">
@@ -369,7 +289,7 @@
 						</ul>
 						<h4>Définition du guide de lecture & Conseils et bonnes pratiques</h4>
                         <ul>
-                            <li>Le bloc "Définition du guide de lecture" affiche la défintion officielle du guide de lecture.</li>
+                            <li>Le bloc "Définition du guide de lecture" affiche la définition officielle du guide de lecture.</li>
                             <li>Les auteurs de cette application, formateurs et auditeurs Qualiopi, le bloc "Conseils et bonnes pratiques" pour des recommandations pour faciliter la mise en oeuvre de l'indicateur.</li>
 					</section>
 					<section class="mb-4">
@@ -389,8 +309,8 @@
                             </li>
                         </ul>
                     </section>
-					<section class="mb-4">
-                        <h4>Personnalisation du Document</h4>
+					<section class="mb-4 pl-5">
+                        <h5>Personnalisation du document</h5>
                         <p>Dans la vue document, vous pouvez :</p>
                         <ul>
                             <li>Ajouter/modifier le logo de votre organisation</li>
@@ -400,7 +320,7 @@
                         </ul>
                     </section>
 					<section class="mb-4">
-                        <h4>6. Export et Partage</h4>
+                        <h4>Export et Partage</h4>
                         <p>Options disponibles pour l'export :</p>
                         <ul>
                             <li>Impression directe</li>
@@ -417,8 +337,38 @@
         </div>
     </div>
 </div>
-            <!-- Main content -->
-<main class="mr-4 ml-4" id="dashboard-container" data-orga-info-id="{{ app.user.userInfo.orgaInfo.id|default(3) }}">
+<!-- Modal pour suggérer de configurer les paramètres -->
+<div class="modal fade" id="settingsSuggestionModal" tabindex="-1" aria-labelledby="settingsSuggestionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="settingsSuggestionModalLabel">Configuration recommandée</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-3">
+                    <i class="fas fa-info-circle fa-4x pr-5"></i>
+                    <p class="mb-0">
+                        Pour personnaliser les indicateurs affichés selon votre situation, nous vous recommandons de répondre aux questions de paramétrage accessibles via l'icône <i class="fas fa-cog"></i>.
+                    </p>
+                </div>
+                <p>
+                    Ces questions permettront d'adapter l'affichage à votre situation et de mettre en évidence les indicateurs pertinents pour votre organisme.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Plus tard</button>
+                <button type="button" class="btn btn-primary" id="goToSettingsBtn">Configurer maintenant</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Main content -->
+<main class="mr-4 ml-4" id="dashboard-container" 
+      data-orga-info-id="{{ app.user.userInfo.orgaInfo.id|default(3) }}" 
+      data-orga-info='{{ {
+          "org_cat_act": app.user.userInfo.orgaInfo.orgCatAct|default([])|json_encode()|raw
+      }|json_encode()|raw }}'>
 	<div class="row mt-5">
 		<div class="card bg-primary shadow-soft text-center border-light col-md-3 col-lg-1 d-md-block ">
 			<div class="align-middle fs-6">Vos indicateurs</div>
@@ -638,6 +588,119 @@ document.getElementById('generateButton').addEventListener('click', function() {
         // Si on a des données, on procède à la génération
         window.location.href = '{{ path('app_generate_document', {'indNumb': '0'}) }}'.replace('0', indNumber);
     }
+});
+</script>
+<script>
+// Solution complète pour les problèmes des modals (paramètres et aide)
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Application du correctif pour les modals');
+    
+    // Fonction pour nettoyer les modals avant d'en ouvrir un nouveau
+    function cleanupModals() {
+        console.log('Nettoyage des modals et backdrops');
+        
+        // Fermer tous les modals actifs
+        document.querySelectorAll('.modal.show').forEach(openModal => {
+            try {
+                const instance = bootstrap.Modal.getInstance(openModal);
+                if (instance) {
+                    instance.hide();
+                }
+            } catch (error) {
+                console.warn('Erreur lors de la fermeture d\'un modal:', error);
+            }
+        });
+        
+        // Supprimer tous les backdrops
+        document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+            backdrop.remove();
+        });
+        
+        // Nettoyer le body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+    
+    // Fonction pour ouvrir le modal des paramètres
+    window.openSettingsModal = function() {
+        console.log('Ouverture du modal des paramètres');
+        cleanupModals();
+        
+        const settingModal = document.getElementById('SettingModal');
+        if (settingModal) {
+            const bsModal = new bootstrap.Modal(settingModal);
+            bsModal.show();
+        } else {
+            console.error('Modal SettingModal non trouvé');
+        }
+    };
+    
+    // Pour le bouton "Configurer maintenant" dans le modal de suggestion
+    const goToSettingsBtn = document.getElementById('goToSettingsBtn');
+    if (goToSettingsBtn) {
+        goToSettingsBtn.addEventListener('click', function() {
+            // Fermer le modal de suggestion
+            const suggestionModal = document.getElementById('settingsSuggestionModal');
+            const modalInstance = bootstrap.Modal.getInstance(suggestionModal);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
+            
+            // Attendre un peu pour ouvrir le modal des paramètres (éviter les conflits)
+            setTimeout(window.openSettingsModal, 300);
+        });
+    }
+    
+    // 1. Restaurer la fonctionnalité du bouton d'aide
+    const helpButton = document.querySelector('.help-btn');
+    if (helpButton) {
+        // Clone le bouton pour supprimer les écouteurs existants
+        const newHelpBtn = helpButton.cloneNode(true);
+        if (helpButton.parentNode) {
+            helpButton.parentNode.replaceChild(newHelpBtn, helpButton);
+        }
+        
+        // Ajouter un nouvel écouteur
+        newHelpBtn.addEventListener('click', function(e) {
+            // Éviter de déclencher si c'est un lien (comme le cas pour le bouton d'email)
+            if (!this.querySelector('a')) {
+                e.preventDefault();
+                console.log('Clic sur le bouton d\'aide');
+                
+                const helpModal = document.getElementById('helpModal');
+                if (helpModal) {
+                    cleanupModals();
+                    const modal = new bootstrap.Modal(helpModal);
+                    modal.show();
+                }
+            }
+        });
+    }
+    
+    // 2. Corriger la fonctionnalité du bouton des paramètres
+    const settingsBtn = document.querySelector('.settings-btn');
+    if (settingsBtn) {
+        // Clone le bouton pour supprimer les écouteurs existants
+        const newSettingsBtn = settingsBtn.cloneNode(true);
+        if (settingsBtn.parentNode) {
+            settingsBtn.parentNode.replaceChild(newSettingsBtn, settingsBtn);
+        }
+        
+        // Ajouter un nouvel écouteur
+        newSettingsBtn.addEventListener('click', function() {
+            console.log('Clic sur le bouton des paramètres');
+            window.openSettingsModal();
+        });
+    }
+    
+    // Ajouter des gestionnaires pour la fermeture des modals
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function() {
+            // Nettoyer après que le modal soit caché
+            setTimeout(cleanupModals, 300);
+        });
+    });
 });
 </script>
 {% endblock %}

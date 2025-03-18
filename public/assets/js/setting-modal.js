@@ -1,284 +1,171 @@
+/**
+ * Script de correction pour setting-modal.js
+ * Ce script résout le problème d'ouverture du modal de paramètres
+ */
+
+// Attendre que le DOM soit complètement chargé
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Initialisation de setting-modal.js');
+    console.log('Initialisation du correctif pour setting-modal.js');
     
-    // Gestionnaire pour les boutons
-    const settingsBtn = document.querySelector('.settings-btn');
-    const helpBtn = document.querySelector('.help-btn');
-    const saveSettingsBtn = document.getElementById('saveSettings');
-    
-    if (settingsBtn) {
-        settingsBtn.addEventListener('click', function() {
-            console.log('Ouverture du modal des paramètres');
-            const settingModal = new bootstrap.Modal(document.getElementById('SettingModal'));
-            settingModal.show();
-        });
-    }
-    
-    if (helpBtn) {
-        helpBtn.addEventListener('click', function() {
-            const helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
-            helpModal.show();
-        });
-    }
-    
-    if (saveSettingsBtn) {
-        saveSettingsBtn.addEventListener('click', function() {
-            saveSettings();
-        });
-    }
-    
-    // Fonction de sauvegarde des paramètres
-    function saveSettings() {
-        console.log('Sauvegarde des paramètres');
+    // Définir correctement la fonction d'ouverture du modal de paramètres
+    window.openSettingsModal = function() {
+        console.log('Tentative d\'ouverture du modal de paramètres');
         
-        try {
-            // 1. Récupérer les réponses
-            const responses = {};
-            for (let i = 1; i <= 10; i++) {
-                const radioName = `question${i}`;
-                const selectedRadio = document.querySelector(`input[name="${radioName}"]:checked`);
-                responses[radioName] = selectedRadio ? selectedRadio.value : null;
+        const settingModal = document.getElementById('SettingModal');
+        if (settingModal) {
+            // S'assurer qu'il n'y a pas de backdrop résiduel avant d'ouvrir le modal
+            removeAllModalsAndBackdrops();
+            
+            // Utiliser l'API Bootstrap pour ouvrir le modal
+            const modal = new bootstrap.Modal(settingModal);
+            modal.show();
+            console.log('Modal de paramètres ouvert avec succès');
+        } else {
+            console.error('Modal de paramètres non trouvé dans le DOM');
+        }
+    };
+    
+    // Connexion correcte du bouton de paramètres flottant
+    const settingsBtn = document.querySelector('.settings-btn');
+    if (settingsBtn) {
+        console.log('Bouton de paramètres trouvé, ajout de l\'écouteur d\'événement');
+        settingsBtn.addEventListener('click', function() {
+            console.log('Clic sur le bouton de paramètres');
+            window.openSettingsModal();
+        });
+    } else {
+        console.warn('Bouton de paramètres non trouvé dans le DOM');
+    }
+    
+    // Fonction améliorée pour nettoyer tous les modals et backdrops
+    function removeAllModalsAndBackdrops() {
+        console.log('Nettoyage de tous les modals et backdrops');
+        
+        // Fermer tous les modals Bootstrap actifs
+        const openModals = document.querySelectorAll('.modal.show');
+        openModals.forEach(modalElement => {
+            try {
+                const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                if (modalInstance) {
+                    modalInstance.hide();
+                }
+            } catch (error) {
+                console.warn('Erreur lors de la fermeture d\'un modal:', error);
             }
-            console.log('Réponses collectées:', responses);
-            
-            // 2. Trouver l'ID de l'organisme
-            const orgaInfoId = 3; // ID trouvé dans les logs
-            
-            // 3. Convertir les valeurs "oui"/"non" en booléens pour le backend
-            const settings = {};
-            for (let i = 1; i <= 10; i++) {
-                const questionKey = `question${i}`;
-                if (questionKey in responses) {
-                    // Convertir "oui" en true et "non" en false
-                    settings[questionKey] = responses[questionKey] === 'oui';
+        });
+        
+        // Supprimer tous les backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // Nettoyer les classes et styles du body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+    }
+    
+    // Remplacer la fonction window.removeModalBackdrop par notre version améliorée
+    window.removeModalBackdrop = removeAllModalsAndBackdrops;
+    
+    // Gérer correctement les boutons de fermeture du modal
+    const closeButtons = document.querySelectorAll('#SettingModal .btn-close, #SettingModal button[data-bs-dismiss="modal"]');
+    closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const settingModal = document.getElementById('SettingModal');
+            if (settingModal) {
+                const modalInstance = bootstrap.Modal.getInstance(settingModal);
+                if (modalInstance) {
+                    modalInstance.hide();
                 }
             }
+            // Nettoyer après la fermeture
+            setTimeout(removeAllModalsAndBackdrops, 300);
+        });
+    });
+    
+    // Initialiser les événements de sauvegarde des paramètres
+    initSaveSettings();
+    
+    console.log('Correctif pour setting-modal.js chargé avec succès');
+});
+
+// Fonction pour initialiser la sauvegarde des paramètres
+function initSaveSettings() {
+    const saveSettingsBtn = document.getElementById('saveSettings');
+    if (saveSettingsBtn) {
+        console.log('Initialisation du bouton de sauvegarde des paramètres');
+        
+        saveSettingsBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            console.log('Clic sur le bouton de sauvegarde des paramètres');
             
-            // 4. Ajouter l'ID de l'organisme
-            settings.orgaInfo = { id: orgaInfoId };
+            // Récupérer les valeurs du formulaire
+            const settings = {
+                question1: document.querySelector('input[name="question1"]:checked')?.value || null,
+                question2: document.querySelector('input[name="question2"]:checked')?.value || null,
+                question3: document.querySelector('input[name="question3"]:checked')?.value || null,
+                certification: document.querySelector('input[name="certification"]:checked')?.value || null,
+                orgaInfo: {
+                    id: document.getElementById('dashboard-container')?.dataset.orgaInfoId || null
+                }
+            };
             
-            console.log('Données envoyées au serveur:', settings);
+            console.log('Paramètres à sauvegarder:', settings);
             
-            // 5. Sauvegarde en base de données
+            // Envoyer les données au serveur
             fetch('/save-settings', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
                 },
                 body: JSON.stringify(settings)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Paramètres sauvegardés en base de données:', data);
+                console.log('Réponse du serveur:', data);
                 
-                // 6. Appliquer les paramètres aux indicateurs
-                applySettingsToIndicators(responses);
+                // Afficher une notification de succès
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('Paramètres sauvegardés avec succès', 'success');
+                } else {
+                    alert('Paramètres sauvegardés avec succès');
+                }
                 
-                // 7. Notification de succès
-                alert('Paramètres sauvegardés avec succès');
+                // Fermer le modal
+                const settingModal = document.getElementById('SettingModal');
+                if (settingModal) {
+                    const modalInstance = bootstrap.Modal.getInstance(settingModal);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                }
                 
-                // 8. Marquer comme sauvegardé pour éviter la restauration
-                window.settingsSaved = true;
+                // Actualiser les indicateurs si window.userSettings existe
+                if (window.userSettings) {
+                    // Mettre à jour les paramètres utilisateur
+                    window.userSettings.question1 = settings.question1;
+                    window.userSettings.question2 = settings.question2;
+                    window.userSettings.question3 = settings.question3;
+                    window.userSettings.certification = settings.certification;
+                    
+                    // Appliquer les nouveaux paramètres aux indicateurs si la fonction existe
+                    if (typeof window.applySettingsToIndicators === 'function') {
+                        window.applySettingsToIndicators(window.userSettings);
+                    }
+                }
             })
             .catch(error => {
-                console.error('Erreur lors de la sauvegarde:', error);
-                alert('Erreur lors de la sauvegarde: ' + error.message);
-            })
-            .finally(() => {
-                // 9. Fermer et nettoyer le modal
-                closeModal();
+                console.error('Erreur lors de la sauvegarde des paramètres:', error);
+                
+                // Afficher une notification d'erreur
+                if (typeof window.showNotification === 'function') {
+                    window.showNotification('Erreur lors de la sauvegarde des paramètres', 'error');
+                } else {
+                    alert('Erreur lors de la sauvegarde des paramètres');
+                }
             });
-        } catch (error) {
-            console.error('Erreur lors du processus de sauvegarde:', error);
-            alert('Une erreur est survenue: ' + error.message);
-            closeModal();
-        }
+        });
+    } else {
+        console.warn('Bouton de sauvegarde des paramètres non trouvé');
     }
-    
-    // Fonction pour fermer proprement le modal
-    function closeModal() {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('SettingModal'));
-        if (modal) {
-            modal.hide();
-            
-            setTimeout(() => {
-                document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-                    backdrop.remove();
-                });
-                document.body.classList.remove('modal-open');
-                document.body.style.removeProperty('overflow');
-                document.body.style.removeProperty('padding-right');
-            }, 300);
-        }
-    }
-    
-    // Fonction pour appliquer les paramètres aux indicateurs
-    function applySettingsToIndicators(settings) {
-    console.log('Application des paramètres aux indicateurs:', settings);
-    
-    // Liste exhaustive des règles de désactivation
-    const indicatorRules = {
-        'question1': { 
-            'non': { disableIndicators: [16, 17, 18] } 
-        },
-        'question2': { 
-            'non': { disableIndicators: [8, 9, 10] } 
-        },
-        'question3': { 
-            'oui': { disableIndicators: [1, 2, 3] },
-            'non': { disableIndicators: [19, 20, 21] } 
-        },
-        'question4': { 
-            'non': { 
-                disableIndicators: [13, 28],
-                enableIndicators: [] 
-            } 
-        },
-        'question5': { 
-            'non': { disableIndicators: [27] } 
-        },
-        'question6': { 
-            'non': { disableIndicators: [4, 7, 14, 15] } 
-        },
-        'question7': { 
-            'oui': { enableIndicators: [12] } 
-        },
-        'question9': { 
-            'non': { disableIndicators: [7, 16] } 
-        },
-        'question10': { 
-            'non': { disableIndicators: [28] } 
-        }
-    };
-
-    // Réinitialiser tous les indicateurs
-    document.querySelectorAll('.indicator-grid span').forEach(indicator => {
-        indicator.classList.remove('inactive');
-        indicator.classList.add('active');
-        indicator.style.opacity = '1';
-    });
-
-    // Appliquer les règles de désactivation
-    Object.keys(indicatorRules).forEach(questionKey => {
-        const response = settings[questionKey];
-        
-        if (response) {
-            const rules = indicatorRules[questionKey][response.toLowerCase()];
-            
-            if (rules) {
-                // Désactiver les indicateurs
-                if (rules.disableIndicators) {
-                    rules.disableIndicators.forEach(indNum => {
-                        const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
-                        if (indicator) {
-                            indicator.classList.remove('active');
-                            indicator.classList.add('inactive');
-                            indicator.style.opacity = '0.5';
-                        }
-                    });
-                }
-
-                // Activer des indicateurs spécifiques
-                if (rules.enableIndicators) {
-                    rules.enableIndicators.forEach(indNum => {
-                        const indicator = document.getElementById(`ind_${String(indNum).padStart(2, '0')}`);
-                        if (indicator) {
-                            indicator.classList.remove('inactive');
-                            indicator.classList.add('active');
-                            indicator.style.opacity = '1';
-                        }
-                    });
-                }
-            }
-        }
-    });
-
-    // Mettre à jour la visibilité
-    window.updateIndicatorVisibility();
 }
-    
-    // Charger les paramètres au chargement de la page
-    function loadSettings() {
-        console.log('Chargement des paramètres');
-        
-        // Récupérer l'ID de l'organisme
-        const orgaInfoId = 3; // ID trouvé dans les logs
-        
-        fetch(`/get-settings?orgaInfoId=${orgaInfoId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Paramètres récupérés:', data);
-                
-                // Si aucune donnée n'est retournée, ne rien faire
-                if (!data || Object.keys(data).length === 0) {
-                    console.log('Aucun paramètre trouvé');
-                    return;
-                }
-                
-                // Remplir le formulaire avec les réponses
-                for (let i = 1; i <= 10; i++) {
-                    const questionKey = `question${i}`;
-                    if (questionKey in data) {
-                        // Convertir les booléens en "oui"/"non"
-                        const value = data[questionKey] === true ? 'oui' : 'non';
-                        const radio = document.querySelector(`input[name="${questionKey}"][value="${value}"]`);
-                        if (radio) {
-                            radio.checked = true;
-                        }
-                    }
-                }
-                
-                // Convertir les valeurs booléennes en oui/non pour l'application aux indicateurs
-                const formattedSettings = {};
-                for (let i = 1; i <= 10; i++) {
-                    const questionKey = `question${i}`;
-                    if (questionKey in data) {
-                        formattedSettings[questionKey] = data[questionKey] === true ? 'oui' : 'non';
-                    }
-                }
-                
-                // Appliquer les paramètres aux indicateurs
-                applySettingsToIndicators(formattedSettings);
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement des paramètres:', error);
-            });
-    }
-    
-    // Écouter l'événement d'ouverture du modal pour sauvegarder l'état des indicateurs
-    const settingModal = document.getElementById('SettingModal');
-    if (settingModal) {
-        settingModal.addEventListener('show.bs.modal', function() {
-            if (typeof window.saveCurrentIndicatorState === 'function') {
-                window.saveCurrentIndicatorState();
-            }
-            window.settingsSaved = false;
-        });
-        
-        // Écouter l'événement de fermeture du modal pour restaurer l'état si nécessaire
-        settingModal.addEventListener('hidden.bs.modal', function() {
-            if (!window.settingsSaved && typeof window.restorePreviousIndicatorState === 'function') {
-                window.restorePreviousIndicatorState();
-            }
-        });
-    }
-    
-    // Charger les paramètres au démarrage
-    loadSettings();
-    
-    // Exposer les fonctions globalement pour le débogage et l'interopérabilité
-    window.applySettingsToIndicators = applySettingsToIndicators;
-    window.saveSettings = saveSettings;
-    window.loadSettings = loadSettings;
-});

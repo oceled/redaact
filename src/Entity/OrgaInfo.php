@@ -48,10 +48,6 @@ class OrgaInfo
 
 	#[ORM\Column(type: 'boolean')]
 	#[Assert\NotNull(message: "Veuillez faire un choix")]
-	private ?bool $orgSubDo = null;
-
-	#[ORM\Column(type: 'boolean')]
-	#[Assert\NotNull(message: "Veuillez faire un choix")]
 	private ?bool $orgSubUse = null;
 
     #[ORM\OneToMany(mappedBy: 'orgaInfo', targetEntity: UserInfo::class)]
@@ -162,17 +158,6 @@ class OrgaInfo
         $this->orgCert = $orgCert;
         return $this;
     }
-
-		public function getOrgSubDo(): ?bool  // Changer string en bool
-	{
-		return $this->orgSubDo;
-	}
-
-	public function setOrgSubDo(bool $orgSubDo): static  // Changer string en bool
-	{
-		$this->orgSubDo = $orgSubDo;
-		return $this;
-	}
 
 	public function getOrgSubUse(): ?bool  // Changer string en bool
 	{

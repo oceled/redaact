@@ -71,7 +71,7 @@ class SettingsController extends AbstractController
         }
 
         // Mettre à jour les réponses aux questions
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $questionKey = "question{$i}";
             if (isset($data[$questionKey])) {
                 $setter = 'set' . ucfirst($questionKey);
@@ -132,7 +132,7 @@ class SettingsController extends AbstractController
         ];
 
         // Ajouter les réponses aux questions
-        for ($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 4; $i++) {
             $questionKey = "question{$i}";
             $getter = 'get' . ucfirst($questionKey);
             
